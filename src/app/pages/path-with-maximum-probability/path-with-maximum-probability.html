@@ -1,0 +1,96 @@
+<main class="problem-page">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a routerLink="/">Overview</a>
+    <i class="pi pi-angle-right" aria-hidden="true"></i>
+    <span>Graph</span>
+  </nav>
+
+  <header class="problem-heading">
+    <div class="problem-title">
+      <span class="eyebrow"><i class="pi pi-share-alt" aria-hidden="true"></i> GRAPH PROBLEM</span>
+      <h1><span class="problem-number">1514.</span> Path with Maximum Probability</h1>
+      <p>Find the path between two nodes whose edge probabilities produce the highest chance of success.</p>
+    </div>
+    <div class="heading-actions">
+      <span class="difficulty"><span></span> Medium</span>
+      <a class="leetcode-link" href="https://leetcode.com/problems/path-with-maximum-probability/description/" target="_blank" rel="noopener noreferrer">
+        View problem <i class="pi pi-arrow-up-right" aria-hidden="true"></i>
+      </a>
+    </div>
+  </header>
+
+  <section class="example-card" aria-labelledby="example-title">
+    <div class="example-copy">
+      <span class="section-kicker">EXAMPLE 1</span>
+      <h2 id="example-title">Choose the more reliable route</h2>
+      <p>From node 0 to node 2, the direct edge has probability 0.2. The route through node 1 has probability 0.5 × 0.5 = 0.25.</p>
+    </div>
+    <div class="example-result">
+      <span>Maximum probability</span>
+      <strong>0.25000</strong>
+      <small>Path: 0 → 1 → 2</small>
+    </div>
+  </section>
+
+  <section class="model-editor" aria-labelledby="model-title">
+    <header class="model-header">
+      <div>
+        <span class="section-kicker">LIVE GRAPH INPUT</span>
+        <h2 id="model-title">Adjacency list model</h2>
+        <p>Edit the model values; the graph canvas updates from the same model.</p>
+      </div>
+      <label class="node-count-field">
+        <span>Number of nodes</span>
+        <input type="number" min="2" step="1" [value]="nodeCount()" (change)="updateNodeCount($event)" />
+      </label>
+    </header>
+
+    <div class="model-options">
+      <label class="model-switch">
+        <input type="checkbox" [checked]="isDirected()" (change)="updateDirected($event)" />
+        <span>Directed graph</span>
+      </label>
+      <label class="model-switch">
+        <input type="checkbox" [checked]="isWeighted()" (change)="updateWeighted($event)" />
+        <span>Weighted edges</span>
+      </label>
+      <span class="tuple-hint">{{ isWeighted() ? '[from, to, probability]' : '[from, to]' }}</span>
+    </div>
+
+    <div class="edge-list" aria-label="Graph edges">
+      <div class="edge-list-heading"><span>EDGES</span><span>{{ edges().length }} total</span></div>
+      @for (edge of edges(); track edge.id; let index = $index) {
+        <div class="edge-row">
+          <span class="edge-index">{{ index + 1 }}</span>
+          <label>
+            <span>From</span>
+            <input type="number" min="0" [max]="nodeCount() - 1" step="1" [value]="edge.from" (change)="updateEdgeField(edge.id, 'from', $event)" />
+          </label>
+          <label>
+            <span>To</span>
+            <input type="number" min="0" [max]="nodeCount() - 1" step="1" [value]="edge.to" (change)="updateEdgeField(edge.id, 'to', $event)" />
+          </label>
+          @if (isWeighted()) {
+            <label class="weight-field">
+              <span>Probability</span>
+              <input type="number" min="0" max="1" step="0.01" [value]="edge.weight" (change)="updateEdgeField(edge.id, 'weight', $event)" />
+            </label>
+          }
+          <code class="edge-tuple">{{ isWeighted() ? '[' + edge.from + ', ' + edge.to + ', ' + edge.weight + ']' : '[' + edge.from + ', ' + edge.to + ']' }}</code>
+          <button class="remove-edge" type="button" [attr.aria-label]="'Remove edge ' + (index + 1)" (click)="removeEdge(edge.id)">
+            <i class="pi pi-trash" aria-hidden="true"></i>
+          </button>
+        </div>
+      } @empty {
+        <p class="empty-edges">No edges yet. Add an edge to connect two nodes.</p>
+      }
+    </div>
+
+    <footer class="model-footer">
+      <button class="add-edge-button" type="button" (click)="addEdge()"><i class="pi pi-plus" aria-hidden="true"></i> Add edge</button>
+      <span>Node indexes run from 0 to {{ nodeCount() - 1 }}.</span>
+    </footer>
+  </section>
+
+  <app-graph title="Example graph" [graphData]="graphData()" />
+</main>

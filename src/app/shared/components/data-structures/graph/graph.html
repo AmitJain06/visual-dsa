@@ -3,31 +3,37 @@
     <div class="graph-toolbar-heading">
       <span class="graph-toolbar-kicker">DATA STRUCTURE</span>
       <h2>{{ title() }} settings</h2>
-      <p>Set graph-wide rules for nodes and edges.</p>
+      @if (graphData()) {
+        <p>Generated from the adjacency list model.</p>
+      } @else {
+        <p>Set graph-wide rules for nodes and edges.</p>
+      }
     </div>
 
-    <div class="graph-options">
-      <label class="graph-toggle" for="graph-directed">
-        <span><strong>Directed</strong><small>Edges point from source to destination.</small></span>
-        <input id="graph-directed" type="checkbox" [checked]="directed()" (change)="updateDirected($event)" />
-      </label>
+    @if (!graphData()) {
+      <div class="graph-options">
+        <label class="graph-toggle" for="graph-directed">
+          <span><strong>Directed</strong><small>Edges point from source to destination.</small></span>
+          <input id="graph-directed" type="checkbox" [checked]="directed()" (change)="updateDirected($event)" />
+        </label>
 
-      <label class="graph-toggle" for="graph-weighted">
-        <span><strong>Weighted</strong><small>Edges display a weight at their midpoint.</small></span>
-        <input id="graph-weighted" type="checkbox" [checked]="weighted()" (change)="updateWeighted($event)" />
-      </label>
+        <label class="graph-toggle" for="graph-weighted">
+          <span><strong>Weighted</strong><small>Edges display a weight at their midpoint.</small></span>
+          <input id="graph-weighted" type="checkbox" [checked]="weighted()" (change)="updateWeighted($event)" />
+        </label>
 
-      <label class="node-value-type" for="graph-node-value-type">
-        <span>Node value type</span>
-        <select id="graph-node-value-type" [value]="nodeValueType()" (change)="updateNodeValueType($event)">
-          <option value="int">Integer</option>
-          <option value="string">String</option>
-          <option value="char">Character</option>
-          <option value="double">Double</option>
-          <option value="boolean">Boolean</option>
-        </select>
-      </label>
-    </div>
+        <label class="node-value-type" for="graph-node-value-type">
+          <span>Node value type</span>
+          <select id="graph-node-value-type" [value]="nodeValueType()" (change)="updateNodeValueType($event)">
+            <option value="int">Integer</option>
+            <option value="string">String</option>
+            <option value="char">Character</option>
+            <option value="double">Double</option>
+            <option value="boolean">Boolean</option>
+          </select>
+        </label>
+      </div>
+    }
   </header>
 
   <app-visual-canvas
