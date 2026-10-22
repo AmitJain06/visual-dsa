@@ -13,3 +13,5 @@ When creating a new Angular component, refer to `agentFiles/component-creation.m
 When creating or changing the visual canvas or its shape system, refer to `agentFiles/canvas-architecture.md` and follow its architecture rules.
 
 When creating or changing any canvas shape, refer to `agentFiles/shape.md` and follow its shape design and shared properties toolbar rules.
+
+When creating or changing shared data models, refer to `agentFiles/model-creation.md` and follow its model design rules.
