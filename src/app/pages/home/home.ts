@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { VisualCanvas } from '../../shared/components/visual-canvas/visual-canvas';
+import { Graph } from '../../shared/components/data-structures/graph/graph';
 
 @Component({
   selector: 'app-home',
-  imports: [VisualCanvas],
+  imports: [Graph],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })

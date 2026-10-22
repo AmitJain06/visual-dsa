@@ -1,5 +1,5 @@
 import { Component, computed, ElementRef, input, model, signal, viewChild } from '@angular/core';
-import { CanvasElement, CanvasElementDefinition, CanvasPoint, CANVAS_SHAPE_PALETTE, Edge, GraphNode, GraphNodeDefinition } from '../../models/canvas-shape';
+import { CanvasElement, CanvasElementDefinition, CanvasPoint, CanvasShapeDefaults, CanvasShapePropertyVisibility, CANVAS_SHAPE_PALETTE, Edge, GraphNode, GraphNodeDefinition } from '../../models/canvas-shape';
 import { EdgeComponent } from '../shapes/edge/edge';
 import { GraphNodeComponent } from '../shapes/graph-node/graph-node';
 import { ShapePropertiesPanel } from '../shape-properties-panel/shape-properties-panel';
@@ -30,6 +30,8 @@ export class VisualCanvas {
 
   readonly canvasTitle = input('Visual canvas');
   readonly availableShapes = input<readonly CanvasElementDefinition[]>(CANVAS_SHAPE_PALETTE);
+  readonly shapeDefaults = input<CanvasShapeDefaults>({});
+  readonly shapePropertyVisibility = input<CanvasShapePropertyVisibility>({});
   readonly shapes = model<CanvasElement[]>([]);
   protected readonly selectedId = signal<string | null>(null);
   protected readonly editingShapeId = signal<string | null>(null);
@@ -279,6 +281,8 @@ export class VisualCanvas {
       return;
     }
     const id = this.createShapeId();
+    const edgeDefaults = this.shapeDefaults().edge;
+    const weighted = edgeDefaults?.weighted ?? false;
     const edge: Edge = {
       id,
       type: 'edge',
@@ -287,8 +291,9 @@ export class VisualCanvas {
       targetId: node.id,
       color: this.availableShapes().find((shape) => shape.type === 'edge')?.color ?? '#68708a',
       blinking: false,
-      directed: true,
-      weighted: false,
+      directed: edgeDefaults?.directed ?? true,
+      weighted,
+      ...(weighted ? { weight: 1 } : {}),
       thickness: 2
     };
     this.shapes.update((shapes) => [...shapes, edge]);
@@ -309,12 +314,19 @@ export class VisualCanvas {
       size: 72,
       blinking: false,
       shape: 'circle',
-      value: 0,
-      valueType: 'int'
+      value: this.defaultGraphNodeValue(this.shapeDefaults().graphNode?.valueType ?? 'int'),
+      valueType: this.shapeDefaults().graphNode?.valueType ?? 'int'
     };
     this.shapes.update((shapes) => [...shapes, node]);
     this.selectedId.set(node.id);
     this.statusMessage.set(`Graph node ${node.value} added. Use arrow keys to move it, or drag it on the canvas.`);
+  }
+
+  private defaultGraphNodeValue(valueType: GraphNode['valueType']): GraphNode['value'] {
+    if (valueType === 'string') return '';
+    if (valueType === 'char') return 'A';
+    if (valueType === 'boolean') return false;
+    return 0;
   }
 
   private createShapeId(): string {

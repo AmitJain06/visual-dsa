@@ -43,6 +43,16 @@ export interface Edge extends EdgeDefinition, CanvasShapeStyle {
 export type CanvasElement = GraphNode | Edge;
 export type CanvasElementDefinition = GraphNodeDefinition | EdgeDefinition;
 
+export interface CanvasShapeDefaults {
+  graphNode?: { valueType?: GraphNodeValueType };
+  edge?: { directed?: boolean; weighted?: boolean };
+}
+
+export interface CanvasShapePropertyVisibility {
+  graphNode?: { valueType?: boolean };
+  edge?: { directed?: boolean; weighted?: boolean };
+}
+
 export const CANVAS_SHAPE_PALETTE: readonly CanvasElementDefinition[] = [
   { type: 'graph-node', label: 'Graph node', color: '#776be8' },
   { type: 'edge', label: 'Edge', color: '#68708a' }

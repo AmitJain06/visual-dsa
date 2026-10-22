@@ -147,6 +147,7 @@
       <app-shape-properties-panel
         [shape]="editingShape()"
         [open]="editingShape() !== null"
+        [propertyVisibility]="shapePropertyVisibility()"
         (shapeChange)="updateShape($event)"
         (close)="closeShapeProperties()"
       />

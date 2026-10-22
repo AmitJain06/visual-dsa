@@ -11,6 +11,7 @@
     </header>
 
     @if (selected.type === 'graph-node') {
+      @if (propertyVisibility().graphNode?.valueType !== false) {
       <div class="property-group">
         <label for="graph-node-value-type">Value type</label>
         <select id="graph-node-value-type" [value]="selected.valueType" (change)="updateGraphNodeValueType($event)">
@@ -21,6 +22,7 @@
           <option value="boolean">Boolean</option>
         </select>
       </div>
+      }
       <div class="property-group">
         <label for="graph-node-value">Value</label>
         @if (selected.valueType === 'boolean') {
@@ -48,18 +50,22 @@
         </select>
       </div>
     } @else {
+      @if (propertyVisibility().edge?.directed !== false) {
       <div class="property-group">
         <label class="option-control" for="edge-directed">
           <span><strong>Directed</strong><small>Show an arrow toward the destination node.</small></span>
           <input id="edge-directed" class="option-checkbox" type="checkbox" [checked]="selected.directed" (change)="updateEdgeDirected($event)" />
         </label>
       </div>
+      }
+      @if (propertyVisibility().edge?.weighted !== false) {
       <div class="property-group">
         <label class="option-control" for="edge-weighted">
           <span><strong>Weighted</strong><small>Show a value at the edge midpoint.</small></span>
           <input id="edge-weighted" class="option-checkbox" type="checkbox" [checked]="selected.weighted" (change)="updateEdgeWeighted($event)" />
         </label>
       </div>
+      }
       @if (selected.weighted) {
         <div class="property-group">
           <label for="edge-weight">Weight</label>

@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { CanvasElement, CanvasNodeShape, CanvasShapeStyle, Edge, GraphNode, GraphNodeValueType } from '../../models/canvas-shape';
+import { CanvasElement, CanvasNodeShape, CanvasShapePropertyVisibility, CanvasShapeStyle, Edge, GraphNode, GraphNodeValueType } from '../../models/canvas-shape';
 
 @Component({
   selector: 'app-shape-properties-panel',
@@ -13,6 +13,7 @@ import { CanvasElement, CanvasNodeShape, CanvasShapeStyle, Edge, GraphNode, Grap
 export class ShapePropertiesPanel {
   readonly shape = input<CanvasElement | null>(null);
   readonly open = input(false);
+  readonly propertyVisibility = input<CanvasShapePropertyVisibility>({});
   readonly shapeChange = output<CanvasElement>();
   readonly close = output<void>();
 
