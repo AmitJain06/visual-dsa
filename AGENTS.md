@@ -7,3 +7,5 @@ Before changing any files in this repository:
 3. If a file under `agentFiles/` cannot be read, stop before making edits and report which file could not be read.
 
 Add repository-specific guidance as files under `agentFiles/`. Keep this root file as the required entry point so all guidance in that directory is discovered before changes.
+
+When creating a new Angular component, refer to `agentFiles/component-creation.md` and follow its component-specific rules.

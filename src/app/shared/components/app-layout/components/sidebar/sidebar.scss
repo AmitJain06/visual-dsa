@@ -1,0 +1,58 @@
+
+    :host { position: relative; z-index: 20; display: block; min-width: 0; height: 100%; }
+    .sidebar { display: flex; height: 100%; min-width: 0; flex-direction: column; overflow: hidden; padding: 1.15rem .85rem 1rem; border-right: 1px solid #ececf3; background: #fff; }
+    .brand { display: flex; height: 48px; flex: 0 0 auto; align-items: center; gap: .75rem; padding: 0 .45rem; color: inherit; text-decoration: none; white-space: nowrap; }
+    .brand-mark { display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; border-radius: 12px; background: #6f67e9; box-shadow: 0 7px 16px #6f67e933; color: #fff; font-size: 1rem; }
+    .brand-copy { display: flex; flex-direction: column; gap: .14rem; overflow: hidden; transition: opacity .15s ease; }
+    .brand-copy strong { color: #25263c; font-size: 1.02rem; letter-spacing: -.05em; }
+    .brand-copy strong span { color: #7169e7; }
+    .brand-copy small { color: #a0a1b1; font-size: .55rem; font-weight: 700; letter-spacing: .17em; }
+    .sidebar-scroll { flex: 1; overflow: auto; padding-top: 2.1rem; scrollbar-width: thin; }
+    .nav-label { margin: 0 .7rem .6rem; color: #a3a4b3; font-size: .62rem; font-weight: 700; letter-spacing: .14em; white-space: nowrap; }
+    .library-label { margin-top: 2rem; }
+    .nav-link { position: relative; display: flex; width: 100%; height: 42px; align-items: center; gap: .85rem; padding: 0 .75rem; border: 0; border-radius: 10px; background: transparent; color: #77798d; font: inherit; font-size: .86rem; font-weight: 550; text-align: left; text-decoration: none; white-space: nowrap; cursor: pointer; transition: color .18s ease, background .18s ease; }
+    .nav-link > .pi:first-child { display: grid; width: 20px; flex: 0 0 20px; place-items: center; font-size: 1rem; }
+    .nav-link:hover, .child-link:hover { background: #f5f4ff; color: #625bd1; }
+    .nav-link.active { background: #f0efff; color: #655dd8; font-weight: 650; }
+    .nav-link.active::before { position: absolute; top: 10px; bottom: 10px; left: -13px; width: 3px; border-radius: 0 3px 3px 0; background: #726be8; content: ''; }
+    .nav-group { margin-top: .28rem; }
+    .group-chevron { margin-left: auto; font-size: .65rem; transition: transform .18s ease; }
+    .group-open .group-chevron { transform: rotate(180deg); }
+    .nav-children { display: grid; gap: .25rem; margin: .28rem 0 .55rem 1.4rem; padding-left: .75rem; border-left: 1px solid #e9e9f1; animation: reveal .18s ease; }
+    .child-group-toggle { display: flex; width: 100%; height: 31px; align-items: center; justify-content: space-between; gap: .4rem; padding: 0 .45rem; border: 0; border-radius: 7px; background: transparent; color: #77798d; font: inherit; font-size: .74rem; text-align: left; cursor: pointer; }
+    .child-group-toggle:hover { background: #f7f6ff; color: #625bd1; }
+    .child-group-toggle > .pi { flex: 0 0 auto; font-size: .58rem; transition: transform .18s ease; }
+    .subgroup-open > .child-group-toggle > .pi { transform: rotate(180deg); }
+    .page-links { display: grid; gap: .12rem; padding: .08rem 0 .2rem .45rem; animation: reveal .18s ease; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    .child-link { display: flex; min-width: 0; height: 36px; align-items: center; gap: .68rem; padding: 0 .55rem; border-radius: 8px; color: #828497; font-size: .8rem; text-decoration: none; white-space: nowrap; transition: color .18s ease, background .18s ease; }
+    .child-marker { width: 5px; height: 5px; flex: 0 0 auto; border-radius: 50%; background: #c6c7d5; }
+    .child-link.active { background: #f5f4ff; color: #625bd1; font-weight: 650; }
+    .child-link.active .child-marker { background: #7169e7; box-shadow: 0 0 0 3px #7169e71c; }
+    .sidebar-footer { display: flex; align-items: center; gap: .65rem; margin-top: 1rem; padding: .75rem .6rem; border: 1px solid #f0eff7; border-radius: 12px; background: #fbfaff; white-space: nowrap; }
+    .streak-icon { display: grid; width: 30px; height: 30px; flex: 0 0 auto; place-items: center; border-radius: 9px; background: #fff2db; color: #e7a332; }
+    .streak-copy { display: flex; min-width: 0; flex-direction: column; gap: .16rem; overflow: hidden; }
+    .streak-copy strong { color: #424257; font-size: .71rem; }
+    .streak-copy span { color: #a0a1b1; font-size: .62rem; }
+    .footer-more { margin-left: auto; color: #a2a3b2; font-size: .8rem; }
+    .sidebar.is-collapsed { padding-right: .75rem; padding-left: .75rem; }
+    .sidebar.is-collapsed .brand { justify-content: center; padding: 0; }
+    .sidebar.is-collapsed .brand-copy, .sidebar.is-collapsed .nav-label, .sidebar.is-collapsed .nav-link > span, .sidebar.is-collapsed .group-chevron, .sidebar.is-collapsed .nav-children, .sidebar.is-collapsed .streak-copy, .sidebar.is-collapsed .footer-more { display: none; }
+    .sidebar.is-collapsed .sidebar-scroll { padding-top: 2.1rem; overflow: visible; }
+    .sidebar.is-collapsed .nav-link { justify-content: center; padding: 0; }
+    .sidebar.is-collapsed .nav-link.active::before { left: -13px; }
+    .sidebar.is-collapsed .sidebar-footer { justify-content: center; padding: .55rem; }
+    @media (max-width: 900px) { .sidebar { padding-right: .7rem; padding-left: .7rem; } }
+    @media (max-width: 700px) {
+      :host { position: fixed; inset: 0 auto 0 0; width: min(286px, 84vw); height: 100dvh; transform: translateX(-105%); transition: transform .22s ease; }
+      :host(.mobile-open) { transform: translateX(0); }
+      .sidebar { height: 100%; padding: 1.15rem .85rem 1rem; box-shadow: 16px 0 40px #24243a20; }
+      .sidebar.is-collapsed { padding: 1.15rem .85rem 1rem; }
+      .sidebar.is-collapsed .brand { justify-content: flex-start; padding: 0 .45rem; }
+      .sidebar.is-collapsed .brand-copy, .sidebar.is-collapsed .nav-label, .sidebar.is-collapsed .nav-link > span, .sidebar.is-collapsed .group-chevron, .sidebar.is-collapsed .streak-copy, .sidebar.is-collapsed .footer-more { display: initial; }
+      .sidebar.is-collapsed .brand-copy { display: flex; }
+      .sidebar.is-collapsed .nav-children { display: grid; }
+      .sidebar.is-collapsed .nav-link { justify-content: flex-start; padding: 0 .75rem; }
+      .sidebar.is-collapsed .sidebar-footer { justify-content: flex-start; padding: .75rem .6rem; }
+    }
+  

@@ -1,0 +1,81 @@
+
+    <aside class="sidebar" [class.is-collapsed]="collapsed() && !mobileOpen()" [class.is-mobile-open]="mobileOpen()" aria-label="Main navigation">
+      <a class="brand" routerLink="/" aria-label="Visual DSA home" (click)="itemSelected.emit()">
+        <span class="brand-mark"><i class="pi pi-sitemap" aria-hidden="true"></i></span>
+        <span class="brand-copy"><strong>visual<span>dsa</span></strong><small>LEARNING STUDIO</small></span>
+      </a>
+
+      <div class="sidebar-scroll">
+        <p class="nav-label">WORKSPACE</p>
+        <a
+          class="nav-link overview-link"
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          title="Overview"
+          (click)="itemSelected.emit()"
+        >
+          <i class="pi pi-home" aria-hidden="true"></i>
+          <span>Overview</span>
+        </a>
+
+        <p class="nav-label library-label">LIBRARY</p>
+        @for (group of navigation; track group.id) {
+          <section class="nav-group" [class.group-open]="isExpanded(group.id)">
+            <button
+              class="nav-link group-toggle"
+              type="button"
+              [attr.aria-expanded]="isExpanded(group.id)"
+              [attr.aria-controls]="'nav-' + group.id"
+              [title]="group.label"
+              (click)="toggleGroup(group.id)"
+            >
+              <i [class]="'pi ' + group.icon" aria-hidden="true"></i>
+              <span>{{ group.label }}</span>
+              <i class="pi pi-chevron-down group-chevron" aria-hidden="true"></i>
+            </button>
+            @if (isExpanded(group.id)) {
+              <div class="nav-children" [id]="'nav-' + group.id">
+                @for (subgroup of group.subgroups; track subgroup.id) {
+                  <section class="nav-subgroup" [class.subgroup-open]="isExpanded(subgroup.id)">
+                    <button
+                      class="child-group-toggle"
+                      type="button"
+                      [attr.aria-expanded]="isExpanded(subgroup.id)"
+                      [attr.aria-controls]="'nav-' + subgroup.id"
+                      (click)="toggleGroup(subgroup.id)"
+                    >
+                      <span>{{ subgroup.label }}</span>
+                      <i class="pi pi-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    @if (isExpanded(subgroup.id)) {
+                      <div class="page-links" [id]="'nav-' + subgroup.id">
+                        @for (page of subgroup.pages; track page.path) {
+                          <a
+                            class="child-link"
+                            [routerLink]="page.path"
+                            routerLinkActive="active"
+                            [title]="page.label"
+                            (click)="itemSelected.emit()"
+                          >
+                            <span class="child-marker"></span>
+                            <span>{{ page.label }}</span>
+                          </a>
+                        }
+                      </div>
+                    }
+                  </section>
+                }
+              </div>
+            }
+          </section>
+        }
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="streak-icon"><i class="pi pi-bolt" aria-hidden="true"></i></div>
+        <div class="streak-copy"><strong>Keep the streak</strong><span>A little practice daily</span></div>
+        <i class="pi pi-ellipsis-h footer-more" aria-hidden="true"></i>
+      </div>
+    </aside>
+  

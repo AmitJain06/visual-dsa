@@ -1,0 +1,23 @@
+
+    :host { position: relative; z-index: 10; display: block; min-width: 0; }
+    .topbar { display: flex; height: 100%; min-width: 0; align-items: center; justify-content: space-between; padding: 0 2rem; border-bottom: 1px solid #ececf3; background: #fff; }
+    .topbar-start, .topbar-end { display: flex; align-items: center; gap: 1.15rem; }
+    .icon-button { position: relative; display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; border: 1px solid transparent; border-radius: 10px; background: transparent; color: #77798d; font-size: .95rem; cursor: pointer; transition: background .18s ease, color .18s ease; }
+    .icon-button:hover { background: #f5f4ff; color: #625bd1; }
+    .breadcrumb { display: flex; align-items: center; gap: .65rem; color: #9a9baa; font-size: .8rem; }
+    .breadcrumb .pi { font-size: .68rem; }
+    .breadcrumb strong { color: #3c3d51; font-weight: 650; }
+    .topbar-note { display: flex; align-items: center; gap: .48rem; color: #9294a5; font-size: .74rem; }
+    .status-dot, .notification-dot { width: 7px; height: 7px; border-radius: 50%; background: #53c99a; }
+    .notification-button { border-color: #efeff5; }
+    .notification-dot { position: absolute; top: 8px; right: 8px; width: 6px; height: 6px; border: 1px solid white; background: #f07c8b; }
+    .avatar { display: grid; width: 34px; height: 34px; place-items: center; border: 2px solid #e8e6ff; border-radius: 50%; background: #f1f0ff; color: #665ed7; font-size: .69rem; font-weight: 700; }
+    .menu-toggle { border-color: #efeff5; }
+    @media (max-width: 900px) { .topbar { padding: 0 1.2rem; } }
+    @media (max-width: 700px) {
+      .topbar { padding: 0 .9rem; }
+      .topbar-start, .topbar-end { gap: .65rem; }
+      .breadcrumb { font-size: .74rem; }
+      .topbar-note { display: none; }
+    }
+  

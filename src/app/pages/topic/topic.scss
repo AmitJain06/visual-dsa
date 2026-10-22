@@ -1,0 +1,22 @@
+
+    :host { display: block; min-height: 100%; }
+    .topic-page { max-width: 1120px; margin: 0 auto; padding: 2rem clamp(1.2rem, 4vw, 3.4rem); }
+    .topic-breadcrumb { display: flex; align-items: center; gap: .55rem; color: #a0a1b1; font-size: .76rem; }
+    .topic-breadcrumb a { color: #85879a; text-decoration: none; }
+    .topic-breadcrumb a:hover { color: #645cda; }
+    .topic-breadcrumb .pi { font-size: .64rem; }
+    .topic-card { position: relative; display: flex; min-height: 430px; flex-direction: column; align-items: flex-start; justify-content: center; overflow: hidden; margin-top: 1.4rem; padding: clamp(2rem, 6vw, 4.6rem); border: 1px solid #eeedf7; border-radius: 24px; background: linear-gradient(125deg, #fff 0%, #fbfaff 100%); box-shadow: 0 12px 40px #3b3a6810; }
+    .topic-icon { display: grid; width: 48px; height: 48px; place-items: center; border: 1px solid #e6e3ff; border-radius: 15px; background: #f3f1ff; color: #7068e8; font-size: 1.15rem; }
+    .eyebrow { margin-top: 2rem; color: #7169dc; font-size: .66rem; font-weight: 750; letter-spacing: .16em; }
+    h1 { margin: .6rem 0 .4rem; color: #232438; font-size: clamp(2.2rem, 5vw, 3.6rem); letter-spacing: -.055em; }
+    p { margin: 0; color: #85879a; font-size: .96rem; }
+    .back-link { display: inline-flex; align-items: center; gap: .5rem; margin-top: 1.8rem; color: #655dd8; font-size: .82rem; font-weight: 650; text-decoration: none; }
+    .back-link:hover { color: #4941be; }
+    .preview { position: absolute; right: 8%; bottom: 10%; display: flex; height: 140px; align-items: end; gap: 9px; opacity: .46; transform: rotate(-10deg); }
+    .preview span { width: 22px; border: 1px solid #cac6ff; border-radius: 7px 7px 2px 2px; background: linear-gradient(180deg, #dddaff, #f2f0ff); }
+    .preview span:nth-child(1), .preview span:nth-child(5) { height: 42%; }
+    .preview span:nth-child(2), .preview span:nth-child(7) { height: 70%; }
+    .preview span:nth-child(3), .preview span:nth-child(6) { height: 55%; }
+    .preview span:nth-child(4) { height: 100%; }
+    @media (max-width: 600px) { .topic-card { min-height: 380px; } .preview { right: -3%; bottom: 3%; transform: scale(.72) rotate(-10deg); transform-origin: bottom right; } }
+  
