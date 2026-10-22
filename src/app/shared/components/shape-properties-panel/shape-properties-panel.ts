@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { CanvasElement, CanvasNodeShape, CanvasNodeStyle, GraphNodeValueType } from '../../models/canvas-shape';
+import { CanvasElement, CanvasNodeShape, CanvasShapeStyle, Edge, GraphNode, GraphNodeValueType } from '../../models/canvas-shape';
 
 @Component({
   selector: 'app-shape-properties-panel',
@@ -16,10 +16,12 @@ export class ShapePropertiesPanel {
   readonly shapeChange = output<CanvasElement>();
   readonly close = output<void>();
 
-  protected update(changes: Partial<CanvasNodeStyle>): void {
-    const shape = this.shape();
-    if (!shape) return;
-    this.shapeChange.emit({ ...shape, ...changes } as CanvasElement);
+  protected updateColor(event: Event): void {
+    this.updateCommon({ color: (event.currentTarget as HTMLInputElement).value });
+  }
+
+  protected updateBlinking(event: Event): void {
+    this.updateCommon({ blinking: (event.currentTarget as HTMLInputElement).checked });
   }
 
   protected updateGraphNodeValue(event: Event): void {
@@ -58,19 +60,52 @@ export class ShapePropertiesPanel {
     this.shapeChange.emit({ ...shape, valueType, value });
   }
 
-  protected updateColor(event: Event): void {
-    this.update({ color: (event.currentTarget as HTMLInputElement).value });
+  protected updateGraphNodeSize(event: Event): void {
+    const shape = this.shape();
+    if (shape?.type !== 'graph-node') return;
+    this.shapeChange.emit({ ...shape, size: Number((event.currentTarget as HTMLInputElement).value) });
   }
 
-  protected updateSize(event: Event): void {
-    this.update({ size: Number((event.currentTarget as HTMLInputElement).value) });
+  protected updateGraphNodeShape(event: Event): void {
+    const shape = this.shape();
+    if (shape?.type !== 'graph-node') return;
+    this.shapeChange.emit({ ...shape, shape: (event.currentTarget as HTMLSelectElement).value as CanvasNodeShape });
   }
 
-  protected updateBlinking(event: Event): void {
-    this.update({ blinking: (event.currentTarget as HTMLInputElement).checked });
+  protected updateEdgeDirected(event: Event): void {
+    const shape = this.shape();
+    if (shape?.type !== 'edge') return;
+    this.shapeChange.emit({ ...shape, directed: (event.currentTarget as HTMLInputElement).checked });
   }
 
-  protected updateNodeShape(event: Event): void {
-    this.update({ shape: (event.currentTarget as HTMLSelectElement).value as CanvasNodeShape });
+  protected updateEdgeWeighted(event: Event): void {
+    const shape = this.shape();
+    if (shape?.type !== 'edge') return;
+    const weighted = (event.currentTarget as HTMLInputElement).checked;
+    this.shapeChange.emit({ ...shape, weighted, weight: weighted ? shape.weight ?? 1 : undefined });
+  }
+
+  protected updateEdgeWeight(event: Event): void {
+    const shape = this.shape();
+    if (shape?.type !== 'edge') return;
+    const input = event.currentTarget as HTMLInputElement;
+    const weight = Number(input.value);
+    if (!input.value || !Number.isFinite(weight)) {
+      input.value = String(shape.weight ?? 1);
+      return;
+    }
+    this.shapeChange.emit({ ...shape, weight });
+  }
+
+  protected updateEdgeThickness(event: Event): void {
+    const shape = this.shape();
+    if (shape?.type !== 'edge') return;
+    this.shapeChange.emit({ ...shape, thickness: Number((event.currentTarget as HTMLInputElement).value) });
+  }
+
+  private updateCommon(changes: Partial<Pick<CanvasShapeStyle, 'color' | 'blinking'>>): void {
+    const shape = this.shape();
+    if (!shape) return;
+    this.shapeChange.emit({ ...shape, ...changes } as GraphNode | Edge);
   }
 }

@@ -27,6 +27,7 @@
 .palette-item:active { cursor: grabbing; }
 .palette-swatch { display: block; width: 24px; height: 24px; flex: 0 0 auto; border: 1.5px solid; }
 .swatch-graph-node { border-color: #776be8; border-radius: 50%; background: #efedff; box-shadow: inset 0 0 0 5px #fff, inset 0 0 0 6px #776be8; }
+.swatch-edge { width: 23px; height: 2px; border: 0; background: #68708a; transform: rotate(-30deg); }
 .palette-name { overflow: hidden; flex: 1; color: #55576b; font-size: .73rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .palette-add { color: #b0b1bf; font-size: .65rem; }
 .palette-item:hover .palette-add { color: #7169df; }
@@ -43,10 +44,10 @@
 .board-meta .pi { color: #827ae1; font-size: .48rem; }
 .canvas-surface { display: block; width: 100%; height: auto; aspect-ratio: 1000 / 620; touch-action: none; }
 .canvas-grid { fill: #fbfbfe; }
-.canvas-connections { pointer-events: none; }
-.canvas-connection { fill: none; stroke: #827ae1; stroke-width: 2; stroke-dasharray: 7 5; vector-effect: non-scaling-stroke; opacity: .85; }
 .canvas-shape { cursor: grab; outline: none; touch-action: none; }
 .canvas-shape.connectable { cursor: crosshair; }
+.canvas-edge { cursor: pointer; outline: none; }
+.canvas-edge:focus-visible { filter: drop-shadow(0 0 4px #756ce866); }
 .canvas-shape:active { cursor: grabbing; }
 .empty-state { position: absolute; top: 50%; left: 50%; display: flex; align-items: center; flex-direction: column; gap: .38rem; color: #a0a1b1; text-align: center; pointer-events: none; transform: translate(-50%, -42%); }
 .empty-icon { display: grid; width: 42px; height: 42px; place-items: center; margin-bottom: .25rem; border: 1px dashed #d8d6ef; border-radius: 13px; background: #fff; color: #8982df; font-size: .95rem; }

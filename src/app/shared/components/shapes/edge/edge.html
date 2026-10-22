@@ -1,0 +1,26 @@
+<svg class="edge-renderer" x="0" y="0" width="1000" height="620" viewBox="0 0 1000 620" preserveAspectRatio="none">
+  <defs>
+    <marker [attr.id]="'edge-arrow-' + edge().id" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 4 L 0 8 z" [attr.fill]="edge().color" />
+    </marker>
+  </defs>
+
+  <path
+    class="edge-hit-area"
+    [attr.d]="'M ' + start().x + ' ' + start().y + ' L ' + end().x + ' ' + end().y"
+    aria-hidden="true"
+  />
+  <path
+    class="edge-line"
+    [class.is-selected]="selected()"
+    [class.is-blinking]="edge().blinking"
+    [attr.d]="'M ' + start().x + ' ' + start().y + ' L ' + end().x + ' ' + end().y"
+    [attr.stroke]="edge().color"
+    [attr.stroke-width]="edge().thickness"
+    [attr.marker-end]="edge().directed ? 'url(#edge-arrow-' + edge().id + ')' : null"
+  />
+
+  @if (edge().weighted && edge().weight !== undefined) {
+    <g class="edge-weight" [attr.transform]="'translate(' + ((start().x + end().x) / 2) + ' ' + ((start().y + end().y) / 2) + ')'"><circle r="14" fill="white" [attr.stroke]="edge().color" /><text text-anchor="middle" dominant-baseline="central">{{ edge().weight }}</text></g>
+  }
+</svg>

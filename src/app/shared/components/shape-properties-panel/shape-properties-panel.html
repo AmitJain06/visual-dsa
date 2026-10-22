@@ -34,6 +34,42 @@
           <input id="graph-node-value" class="value-input" type="number" [attr.step]="selected.valueType === 'int' ? '1' : 'any'" [value]="selected.value" (input)="updateGraphNodeValue($event)" />
         }
       </div>
+      <div class="property-group">
+        <label for="graph-node-size">Size <span>{{ selected.size }} units</span></label>
+        <input id="graph-node-size" class="range-input" type="range" min="32" max="140" step="4" [value]="selected.size" (input)="updateGraphNodeSize($event)" />
+      </div>
+      <div class="property-group">
+        <label for="graph-node-form">Form</label>
+        <select id="graph-node-form" [value]="selected.shape" (change)="updateGraphNodeShape($event)">
+          <option value="circle">Circle</option>
+          <option value="square">Square</option>
+          <option value="diamond">Diamond</option>
+          <option value="triangle">Triangle</option>
+        </select>
+      </div>
+    } @else {
+      <div class="property-group">
+        <label class="option-control" for="edge-directed">
+          <span><strong>Directed</strong><small>Show an arrow toward the destination node.</small></span>
+          <input id="edge-directed" class="option-checkbox" type="checkbox" [checked]="selected.directed" (change)="updateEdgeDirected($event)" />
+        </label>
+      </div>
+      <div class="property-group">
+        <label class="option-control" for="edge-weighted">
+          <span><strong>Weighted</strong><small>Show a value at the edge midpoint.</small></span>
+          <input id="edge-weighted" class="option-checkbox" type="checkbox" [checked]="selected.weighted" (change)="updateEdgeWeighted($event)" />
+        </label>
+      </div>
+      @if (selected.weighted) {
+        <div class="property-group">
+          <label for="edge-weight">Weight</label>
+          <input id="edge-weight" class="value-input" type="number" step="any" [value]="selected.weight ?? 1" (input)="updateEdgeWeight($event)" />
+        </div>
+      }
+      <div class="property-group">
+        <label for="edge-thickness">Thickness <span>{{ selected.thickness }} px</span></label>
+        <input id="edge-thickness" class="range-input" type="range" min="1" max="8" step="1" [value]="selected.thickness" (input)="updateEdgeThickness($event)" />
+      </div>
     }
 
     <div class="property-group">
@@ -42,21 +78,6 @@
         <input id="shape-color" class="color-input" type="color" [value]="selected.color" (input)="updateColor($event)" />
         <span>{{ selected.color }}</span>
       </div>
-    </div>
-
-    <div class="property-group">
-      <label for="shape-size">Size <span>{{ selected.size }} units</span></label>
-      <input id="shape-size" class="range-input" type="range" min="32" max="140" step="4" [value]="selected.size" (input)="updateSize($event)" />
-    </div>
-
-    <div class="property-group">
-      <label for="shape-form">Form</label>
-      <select id="shape-form" [value]="selected.shape" (change)="updateNodeShape($event)">
-        <option value="circle">Circle</option>
-        <option value="square">Square</option>
-        <option value="diamond">Diamond</option>
-        <option value="triangle">Triangle</option>
-      </select>
     </div>
 
     <label class="blinking-control" for="shape-blinking">

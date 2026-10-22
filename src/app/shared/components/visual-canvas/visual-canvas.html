@@ -20,15 +20,15 @@
       <button
         class="tool-button"
         type="button"
-        [class.is-active]="connectMode()"
-        [attr.aria-pressed]="connectMode()"
-        (click)="toggleConnectMode()"
+        [class.is-active]="edgeCreationMode()"
+        [attr.aria-pressed]="edgeCreationMode()"
+        (click)="toggleEdgeCreationMode()"
       >
         <i class="pi pi-share-alt" aria-hidden="true"></i>
-        <span>{{ connectMode() ? 'Connecting' : 'Connect' }}</span>
+        <span>{{ edgeCreationMode() ? 'Adding edge' : 'Add edge' }}</span>
       </button>
       <span class="toolbar-divider" aria-hidden="true"></span>
-      <button class="tool-button icon-tool" type="button" [disabled]="!selectedShape()" aria-label="Duplicate selected shape" title="Duplicate selected shape" (click)="duplicateSelectedShape()">
+      <button class="tool-button icon-tool" type="button" [disabled]="!selectedShape() || selectedShape()?.type === 'edge'" aria-label="Duplicate selected shape" title="Duplicate selected graph node" (click)="duplicateSelectedShape()">
         <i class="pi pi-clone" aria-hidden="true"></i>
       </button>
       <button class="tool-button icon-tool" type="button" [disabled]="!selectedShape()" aria-label="Delete selected shape" title="Delete selected shape" (click)="deleteSelectedShape()">
@@ -41,7 +41,7 @@
   <div class="canvas-layout">
     <aside class="palette-panel" aria-label="Shape palette">
       <div class="panel-heading">
-        <div><h3>Shapes</h3><p>Drag or click to add</p></div>
+        <div><h3>Shapes</h3><p>Drag nodes; select Edge to connect</p></div>
         <span class="shape-count">{{ shapes().length }}</span>
       </div>
 
@@ -50,8 +50,8 @@
           <button
             class="palette-item"
             type="button"
-            draggable="true"
-            [attr.aria-label]="'Add ' + shape.label + ' to canvas. Drag or click.'"
+            [draggable]="shape.type === 'graph-node'"
+            [attr.aria-label]="shape.type === 'edge' ? 'Add an edge by selecting two graph nodes' : 'Add a graph node to canvas. Drag or click.'"
             (dragstart)="beginPaletteDrag($event, shape)"
             (click)="addShapeFromPalette(shape)"
           >
@@ -62,7 +62,7 @@
         }
       </div>
 
-      <div class="palette-tip"><i class="pi pi-lightbulb" aria-hidden="true"></i><span>Right-click a shape on the canvas to edit its properties.</span></div>
+      <div class="palette-tip"><i class="pi pi-lightbulb" aria-hidden="true"></i><span>Select Edge, then choose two graph nodes. Right-click a shape to edit its properties.</span></div>
 
       <div class="palette-footer"><i class="pi pi-info-circle" aria-hidden="true"></i><span>Everything stays in this workspace.</span></div>
     </aside>
@@ -92,30 +92,41 @@
           <pattern [attr.id]="gridPatternId" width="40" height="40" patternUnits="userSpaceOnUse">
             <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e9eaf2" stroke-width="1" />
           </pattern>
-          <marker [attr.id]="arrowMarkerId" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth">
-            <path d="M 0 0 L 10 4 L 0 8 z" fill="#827ae1" />
-          </marker>
         </defs>
         <rect class="canvas-grid" width="1000" height="620" [attr.fill]="'url(#' + gridPatternId + ')'" />
 
-        <g class="canvas-connections" aria-label="Connections">
-          @for (connection of connections(); track connection.id) {
-            @if (connectionPath(connection); as path) {
-              <path class="canvas-connection" [attr.d]="path" [attr.marker-end]="'url(#' + arrowMarkerId + ')'" />
-            }
-          }
-        </g>
-
         @for (shape of shapes(); track shape.id) {
+          @if (shape.type === 'edge') {
+            @if (edgeEndpoints(shape); as endpoints) {
+              <g
+                app-edge
+                class="canvas-edge"
+                [class.is-selected]="selectedId() === shape.id"
+                [class.is-blinking]="shape.blinking"
+                [edge]="shape"
+                [start]="endpoints.start"
+                [end]="endpoints.end"
+                [selected]="selectedId() === shape.id"
+                [attr.aria-label]="'Edge' + (shape.weighted ? ', weight ' + shape.weight : '')"
+                [attr.aria-pressed]="selectedId() === shape.id"
+                tabindex="0"
+                role="button"
+                (pointerdown)="beginShapeMove($event, shape)"
+                (click)="selectShape(shape.id)"
+                (contextmenu)="openShapeProperties($event, shape)"
+                (keydown)="moveShapeWithKeyboard($event, shape)"
+              ></g>
+            }
+          } @else {
             <g
               app-graph-node
               class="canvas-shape"
               [node]="shape"
               [selected]="selectedId() === shape.id"
               [class.is-selected]="selectedId() === shape.id"
-              [class.is-connection-source]="pendingConnectionSourceId() === shape.id"
+              [class.is-connection-source]="pendingEdgeSourceId() === shape.id"
               [class.is-blinking]="shape.blinking"
-              [class.connectable]="connectMode()"
+              [class.connectable]="edgeCreationMode()"
               [attr.transform]="'translate(' + shape.x + ' ' + shape.y + ')'"
               [attr.aria-label]="'Graph node, value ' + shape.value"
               [attr.aria-pressed]="selectedId() === shape.id"
@@ -126,6 +137,7 @@
               (contextmenu)="openShapeProperties($event, shape)"
               (keydown)="moveShapeWithKeyboard($event, shape)"
             ></g>
+          }
         }
       </svg>
 

@@ -1,0 +1,10 @@
+:host { cursor: pointer; outline: none; }
+.edge-renderer { display: block; overflow: visible; pointer-events: none; }
+.edge-hit-area { fill: none; stroke: transparent; stroke-width: 18; pointer-events: stroke; }
+.edge-line { fill: none; stroke-linecap: round; vector-effect: non-scaling-stroke; pointer-events: none; transition: stroke-width .15s ease, filter .15s ease, opacity .15s ease; }
+.edge-line.is-selected { filter: drop-shadow(0 0 4px #756ce866); }
+.edge-weight circle { stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.edge-weight text { fill: #34364c; font-family: Inter, 'Segoe UI', sans-serif; font-size: 12px; font-weight: 700; pointer-events: none; user-select: none; }
+.edge-line.is-blinking { animation: edge-blink 1s ease-in-out infinite; }
+@keyframes edge-blink { 50% { opacity: .28; } }
+@media (prefers-reduced-motion: reduce) { .edge-line.is-blinking { animation: none; opacity: .55; } }

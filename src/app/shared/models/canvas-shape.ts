@@ -1,15 +1,15 @@
 export type CanvasNodeShape = 'circle' | 'square' | 'diamond' | 'triangle';
 export type GraphNodeValueType = 'int' | 'string' | 'char' | 'double' | 'boolean';
 
-export interface CanvasNodeStyle {
+export interface CanvasShapeStyle {
   id: string;
+  color: string;
+  blinking: boolean;
+}
+
+export interface CanvasPoint {
   x: number;
   y: number;
-  color: string;
-  /** Diameter in canvas units. */
-  size: number;
-  blinking: boolean;
-  shape: CanvasNodeShape;
 }
 
 export interface GraphNodeDefinition {
@@ -18,20 +18,32 @@ export interface GraphNodeDefinition {
   color: string;
 }
 
-export interface GraphNode extends GraphNodeDefinition, CanvasNodeStyle {
+export interface GraphNode extends GraphNodeDefinition, CanvasShapeStyle, CanvasPoint {
+  size: number;
+  shape: CanvasNodeShape;
   value: string | number | boolean;
   valueType: GraphNodeValueType;
 }
 
-export type CanvasElement = GraphNode;
-export type CanvasElementDefinition = GraphNodeDefinition;
-
-export interface CanvasConnection {
-  id: string;
-  sourceId: string;
-  targetId: string;
+export interface EdgeDefinition {
+  type: 'edge';
+  label: 'Edge';
+  color: string;
 }
 
+export interface Edge extends EdgeDefinition, CanvasShapeStyle {
+  sourceId: string;
+  targetId: string;
+  directed: boolean;
+  weighted: boolean;
+  weight?: number;
+  thickness: number;
+}
+
+export type CanvasElement = GraphNode | Edge;
+export type CanvasElementDefinition = GraphNodeDefinition | EdgeDefinition;
+
 export const CANVAS_SHAPE_PALETTE: readonly CanvasElementDefinition[] = [
-  { type: 'graph-node', label: 'Graph node', color: '#776be8' }
+  { type: 'graph-node', label: 'Graph node', color: '#776be8' },
+  { type: 'edge', label: 'Edge', color: '#68708a' }
 ];
