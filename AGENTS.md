@@ -1,24 +1,9 @@
-# Repository instructions
+# Repository agent instructions
 
-Read and follow this file before making changes in this repository. Recheck it at the start of each new task that edits project files.
+Before changing any files in this repository:
 
-## Project structure
+1. Read this file.
+2. Read every file under `agentFiles/`, recursively, and follow its instructions. Recheck the directory at the start of each new task that edits files so newly added guidance is included.
+3. If a file under `agentFiles/` cannot be read, stop before making edits and report which file could not be read.
 
-- Keep route-level pages under `src/app/pages/<page-name>/`.
-- Keep components used only by one page under that page's `components/` folder.
-- Put reusable components shared by multiple pages under `src/app/shared/components/`.
-- Put shared TypeScript types and interfaces under `src/app/shared/models/`.
-- Put reusable application services under `src/app/shared/services/`.
-- Register and maintain routes in `src/app/app.routes.ts`.
-
-## Angular and UI
-
-- Use standalone Angular components and the existing Angular Router setup.
-- Import PrimeNG components individually in the standalone components that use them.
-- Keep PrimeNG's global theme configuration in `src/app/app.config.ts` and global styles in `src/styles.scss`.
-- Follow the existing TypeScript and SCSS conventions; avoid adding dependencies unless the task needs them.
-
-## Changes
-
-- Keep edits focused on the requested work and preserve unrelated user changes.
-- Do not commit or push unless explicitly requested.
+Add repository-specific guidance as files under `agentFiles/`. Keep this root file as the required entry point so all guidance in that directory is discovered before changes.
