@@ -9,3 +9,5 @@ Before changing any files in this repository:
 Add repository-specific guidance as files under `agentFiles/`. Keep this root file as the required entry point so all guidance in that directory is discovered before changes.
 
 When creating a new Angular component, refer to `agentFiles/component-creation.md` and follow its component-specific rules.
+
+When creating or changing the visual canvas or its shape system, refer to `agentFiles/canvas-architecture.md` and follow its architecture rules.

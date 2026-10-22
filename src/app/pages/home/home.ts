@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
+import { VisualCanvas } from '../../shared/components/visual-canvas/visual-canvas';
 
 @Component({
   selector: 'app-home',
-  imports: [ButtonModule],
+  imports: [VisualCanvas],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })

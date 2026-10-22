@@ -1,0 +1,33 @@
+# Visual canvas architecture
+
+Read and follow this guide whenever creating or changing the visual canvas, its shape catalog, shape renderers, or code that synchronizes program state with canvas elements.
+
+## Canvas responsibility
+
+The visual canvas is a reusable, independent workspace. It owns the shared editing surface and generic workspace behavior, such as placing, moving, selecting, arranging, and rendering elements. It should be usable by different pages and problem types without embedding one problem's data structure or shape choices into the canvas itself.
+
+Keep the canvas generic. Do not hard-code a fixed set of problem-specific shapes or assume every problem uses the same palette.
+
+## Shape system
+
+Treat shapes as configurable, typed visual elements that the program can create and update. Future shape types include:
+
+- `TreeNode`
+- `LinkListNode`
+- `DoubleLinkListNode`
+- `ArrayElement`
+- Directed and undirected edges
+
+Shape data should support domain values and visual properties needed by problems, such as color, blocked/disabled state, and algorithm state. Use stable identifiers so program state and canvas elements can be synchronized reliably.
+
+Keep shape definitions and shared types separate from the canvas surface. Prefer a shape catalog/registry or another extensible configuration boundary over growing conditionals and a hard-coded palette inside the canvas component. Shape-specific rendering and properties belong to the shape system; generic placement and workspace interactions belong to the canvas.
+
+## Problem-specific configuration and synchronization
+
+The problem/page should configure which shape types and tools are available to the user. A problem may provide a tailored palette or restrict available shapes; the canvas must not make those choices globally.
+
+The program must be able to create and update canvas elements from its data. Design the canvas API so the host can provide or bind element data and receive intentional user edits/events. Keep algorithm state authoritative in the host/program where appropriate, and use stable IDs to map that state to visual elements.
+
+## Component conventions
+
+Reusable canvas and shape components belong under `src/app/shared/components/`; shared interfaces belong under `src/app/shared/models/`. Follow `agentFiles/component-creation.md` for the required TypeScript, HTML, and SCSS files for each Angular component.
