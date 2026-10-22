@@ -62,7 +62,7 @@
         }
       </div>
 
-      <div class="palette-tip"><i class="pi pi-lightbulb" aria-hidden="true"></i><span>Double-click a shape on the canvas to edit its properties.</span></div>
+      <div class="palette-tip"><i class="pi pi-lightbulb" aria-hidden="true"></i><span>Right-click a shape on the canvas to edit its properties.</span></div>
 
       <div class="palette-footer"><i class="pi pi-info-circle" aria-hidden="true"></i><span>Everything stays in this workspace.</span></div>
     </aside>
@@ -107,25 +107,25 @@
         </g>
 
         @for (shape of shapes(); track shape.id) {
-          <g
-            app-graph-node
-            class="canvas-shape"
-            [node]="shape"
-            [selected]="selectedId() === shape.id"
-            [class.is-selected]="selectedId() === shape.id"
-            [class.is-connection-source]="pendingConnectionSourceId() === shape.id"
-            [class.is-blinking]="shape.blinking"
-            [class.connectable]="connectMode()"
-            [attr.transform]="'translate(' + shape.x + ' ' + shape.y + ')'"
-            [attr.aria-label]="'Graph node, value ' + shape.value"
-            [attr.aria-pressed]="selectedId() === shape.id"
-            tabindex="0"
-            role="button"
-            (pointerdown)="beginShapeMove($event, shape)"
-            (click)="selectShape(shape.id)"
-            (contextmenu)="openShapeProperties($event, shape)"
-            (keydown)="moveShapeWithKeyboard($event, shape)"
-          ></g>
+            <g
+              app-graph-node
+              class="canvas-shape"
+              [node]="shape"
+              [selected]="selectedId() === shape.id"
+              [class.is-selected]="selectedId() === shape.id"
+              [class.is-connection-source]="pendingConnectionSourceId() === shape.id"
+              [class.is-blinking]="shape.blinking"
+              [class.connectable]="connectMode()"
+              [attr.transform]="'translate(' + shape.x + ' ' + shape.y + ')'"
+              [attr.aria-label]="'Graph node, value ' + shape.value"
+              [attr.aria-pressed]="selectedId() === shape.id"
+              tabindex="0"
+              role="button"
+              (pointerdown)="beginShapeMove($event, shape)"
+              (click)="selectShape(shape.id)"
+              (contextmenu)="openShapeProperties($event, shape)"
+              (keydown)="moveShapeWithKeyboard($event, shape)"
+            ></g>
         }
       </svg>
 

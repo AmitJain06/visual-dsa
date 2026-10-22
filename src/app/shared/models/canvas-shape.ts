@@ -1,4 +1,16 @@
-export type GraphNodeShape = 'circle' | 'square' | 'diamond' | 'triangle';
+export type CanvasNodeShape = 'circle' | 'square' | 'diamond' | 'triangle';
+export type GraphNodeValueType = 'int' | 'string' | 'char' | 'double' | 'boolean';
+
+export interface CanvasNodeStyle {
+  id: string;
+  x: number;
+  y: number;
+  color: string;
+  /** Diameter in canvas units. */
+  size: number;
+  blinking: boolean;
+  shape: CanvasNodeShape;
+}
 
 export interface GraphNodeDefinition {
   type: 'graph-node';
@@ -6,15 +18,9 @@ export interface GraphNodeDefinition {
   color: string;
 }
 
-export interface GraphNode extends GraphNodeDefinition {
-  id: string;
-  x: number;
-  y: number;
-  value: number;
-  /** Diameter in canvas units. */
-  size: number;
-  blinking: boolean;
-  shape: GraphNodeShape;
+export interface GraphNode extends GraphNodeDefinition, CanvasNodeStyle {
+  value: string | number | boolean;
+  valueType: GraphNodeValueType;
 }
 
 export type CanvasElement = GraphNode;

@@ -11,3 +11,5 @@ Add repository-specific guidance as files under `agentFiles/`. Keep this root fi
 When creating a new Angular component, refer to `agentFiles/component-creation.md` and follow its component-specific rules.
 
 When creating or changing the visual canvas or its shape system, refer to `agentFiles/canvas-architecture.md` and follow its architecture rules.
+
+When creating or changing any canvas shape, refer to `agentFiles/shape.md` and follow its shape design and shared properties toolbar rules.

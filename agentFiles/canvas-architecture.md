@@ -2,6 +2,8 @@
 
 Read and follow this guide whenever creating or changing the visual canvas, its shape catalog, shape renderers, or code that synchronizes program state with canvas elements.
 
+For any shape-specific implementation, also read and follow `agentFiles/shape.md`.
+
 ## Canvas responsibility
 
 The visual canvas is a reusable, independent workspace. It owns the shared editing surface and generic workspace behavior, such as placing, moving, selecting, arranging, and rendering elements. It should be usable by different pages and problem types without embedding one problem's data structure or shape choices into the canvas itself.
@@ -12,15 +14,15 @@ Keep the canvas generic. Do not hard-code a fixed set of problem-specific shapes
 
 Treat shapes as configurable, typed visual elements that the program can create and update. Future shape types include:
 
-- `TreeNode`
 - `LinkListNode`
 - `DoubleLinkListNode`
+- `TreeNode`
 - `ArrayElement`
 - Directed and undirected edges
 
-`GraphNode` is implemented as the first domain shape and has its own standalone Angular component. Each future shape type must also have its own component with adjacent TypeScript, HTML, and SCSS files. A shape component owns its rendering and shape-specific visual behavior; the canvas owns the shared workspace interactions. `GraphNode` has an integer value, color, diameter (`size`, in canvas units), blinking state, and form (`shape`), which defaults to `circle`. Keep its state explicit in the shared model so the host program can create and update it.
+`GraphNode` is currently implemented as a domain shape with its own standalone Angular component. Each future shape type must also have its own component with adjacent TypeScript, HTML, and SCSS files. A shape component owns its rendering and shape-specific visual behavior; the canvas owns the shared workspace interactions. `GraphNode` has color, diameter (`size`, in canvas units), blinking state, and form (`shape`), which defaults to `circle`. Its value supports integer, string, character, double, or boolean types and defaults to integer `0`. Keep its state explicit in the shared model so the host program can create and update it.
 
-Keep shape property editing in the reusable `ShapePropertiesPanel` component. Adding a shape uses its defaults and does not open the editor. Right-clicking a canvas shape opens the properties panel as a sliding drawer from the right; suppress the browser context menu for that shape. The panel emits updated shape data to the canvas; it should be extended with shared controls and type-specific sections as new shapes are added.
+Keep shape property editing in the reusable `ShapePropertiesPanel` component. Adding a shape uses its defaults and does not open the editor. Right-clicking a canvas shape opens the properties panel as a sliding drawer from the right; suppress the browser context menu for that shape. The panel emits updated shape data to the canvas. Keep common style controls shared and extend it with type-specific sections as new shapes are added. For `GraphNode`, include a value type selector for integer, string, character, double, and boolean values.
 
 Shape data should support domain values and visual properties needed by problems, such as color, blocked/disabled state, and algorithm state. Use stable identifiers so program state and canvas elements can be synchronized reliably.
 

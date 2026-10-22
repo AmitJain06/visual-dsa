@@ -236,19 +236,19 @@ export class VisualCanvas {
 
   private addShape(definition: CanvasElementDefinition, point: CanvasPoint): void {
     const id = this.createShapeId();
-    const shape: GraphNode = {
-      ...definition,
+    const common = {
       id,
       x: point.x,
       y: point.y,
-      value: 0,
+      color: definition.color,
       size: 72,
       blinking: false,
-      shape: 'circle'
+      shape: 'circle' as const
     };
+    const shape: CanvasElement = { ...common, ...definition, value: 0, valueType: 'int' } satisfies GraphNode;
     this.shapes.update((shapes) => [...shapes, shape]);
     this.selectedId.set(id);
-    this.statusMessage.set(`Graph node ${shape.value} added. Use arrow keys to move it, or drag it on the canvas.`);
+    this.statusMessage.set(`${shape.label} ${shape.value} added. Use arrow keys to move it, or drag it on the canvas.`);
   }
 
   private createShapeId(): string {
@@ -275,7 +275,7 @@ export class VisualCanvas {
     if (!sourceId) {
       this.pendingConnectionSourceId.set(shape.id);
       this.selectedId.set(shape.id);
-      this.statusMessage.set(`Source selected: Graph node ${shape.value}. Choose a destination node.`);
+      this.statusMessage.set(`Source selected: ${shape.label} ${shape.value}. Choose a destination node.`);
       return;
     }
     if (sourceId === shape.id) {
@@ -287,15 +287,15 @@ export class VisualCanvas {
       connection.sourceId === sourceId && connection.targetId === shape.id
     );
     if (exists) {
-      this.statusMessage.set(`A connection to Graph node ${shape.value} already exists.`);
+      this.statusMessage.set(`A connection to ${shape.label} ${shape.value} already exists.`);
     } else {
       this.connections.update((connections) => [...connections, {
         id: `canvas-connection-${this.nextConnectionId++}`,
         sourceId,
         targetId: shape.id
       }]);
-      const sourceValue = this.shapes().find((item) => item.id === sourceId)?.value;
-      this.statusMessage.set(`Connected Graph node ${sourceValue} to Graph node ${shape.value}.`);
+      const source = this.shapes().find((item) => item.id === sourceId);
+      this.statusMessage.set(`Connected ${source?.label} ${source?.value} to ${shape.label} ${shape.value}.`);
     }
     this.pendingConnectionSourceId.set(null);
   }

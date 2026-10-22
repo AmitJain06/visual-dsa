@@ -21,8 +21,16 @@
 .property-group { margin-bottom: 1.1rem; }
 .property-group > label { display: flex; align-items: center; justify-content: space-between; margin-bottom: .4rem; color: #76778b; font-size: .68rem; font-weight: 650; }
 .property-group > label span { color: #a1a1b0; font-weight: 500; }
-.property-group input[type='number'], .property-group select { width: 100%; height: 36px; padding: 0 .65rem; border: 1px solid #e7e6ef; border-radius: 8px; outline: none; background: #fff; color: #3f4054; font: inherit; font-size: .75rem; }
-.property-group input:focus, .property-group select:focus { border-color: #a9a3f4; box-shadow: 0 0 0 3px #7068e81a; }
+.property-group .value-input, .property-group select { display: block; width: 100%; height: 36px; padding: 0 .65rem; border: 1px solid #e7e6ef; border-radius: 8px; outline: none; background: #fff; color: #3f4054; font: inherit; font-size: .75rem; transition: border-color .16s ease, box-shadow .16s ease; }
+.property-group .value-input::placeholder { color: #b0b0be; }
+.property-group .value-input:focus, .property-group select:focus { border-color: #a9a3f4; box-shadow: 0 0 0 3px #7068e81a; }
+.property-group .character-input { width: 72px; text-align: center; font-size: .9rem; font-weight: 650; }
+.boolean-control { display: flex; align-items: center; justify-content: space-between; min-height: 38px; padding: .35rem .65rem; border: 1px solid #e7e6ef; border-radius: 8px; background: #fff; color: #66677b; font-size: .75rem; }
+.boolean-input { position: relative; width: 36px; height: 20px; flex: 0 0 auto; margin: 0; appearance: none; border: 0; border-radius: 999px; outline: none; background: #d9d9e3; cursor: pointer; transition: background .16s ease, box-shadow .16s ease; }
+.boolean-input::after { position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px #28274133; content: ''; transition: transform .16s ease; }
+.boolean-input:checked { background: #756ce8; }
+.boolean-input:checked::after { transform: translateX(16px); }
+.boolean-input:focus-visible { box-shadow: 0 0 0 3px #7068e833; }
 .color-control { display: flex; align-items: center; gap: .65rem; color: #8c8da0; font-size: .7rem; text-transform: uppercase; }
 .color-input { width: 46px; height: 34px; padding: 2px; border: 1px solid #e7e6ef; border-radius: 8px; background: #fff; cursor: pointer; }
 .range-input { width: 100%; margin: .25rem 0 0; accent-color: #756ce8; }

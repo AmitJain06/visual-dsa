@@ -12,8 +12,27 @@
 
     @if (selected.type === 'graph-node') {
       <div class="property-group">
-        <label for="graph-node-value">Integer value</label>
-        <input id="graph-node-value" type="number" step="1" [value]="selected.value" (input)="updateValue($event)" />
+        <label for="graph-node-value-type">Value type</label>
+        <select id="graph-node-value-type" [value]="selected.valueType" (change)="updateGraphNodeValueType($event)">
+          <option value="int">Integer</option>
+          <option value="string">String</option>
+          <option value="char">Character</option>
+          <option value="double">Double</option>
+          <option value="boolean">Boolean</option>
+        </select>
+      </div>
+      <div class="property-group">
+        <label for="graph-node-value">Value</label>
+        @if (selected.valueType === 'boolean') {
+          <div class="boolean-control">
+            <span>{{ selected.value === true ? 'True' : 'False' }}</span>
+            <input id="graph-node-value" class="boolean-input" type="checkbox" [checked]="selected.value === true" (change)="updateGraphNodeValue($event)" />
+          </div>
+        } @else if (selected.valueType === 'string' || selected.valueType === 'char') {
+          <input id="graph-node-value" class="value-input" [class.character-input]="selected.valueType === 'char'" type="text" [attr.maxlength]="selected.valueType === 'char' ? 1 : null" [value]="selected.value" [attr.placeholder]="selected.valueType === 'char' ? 'A' : 'Enter a value'" (input)="updateGraphNodeValue($event)" />
+        } @else {
+          <input id="graph-node-value" class="value-input" type="number" [attr.step]="selected.valueType === 'int' ? '1' : 'any'" [value]="selected.value" (input)="updateGraphNodeValue($event)" />
+        }
       </div>
     }
 
@@ -30,17 +49,15 @@
       <input id="shape-size" class="range-input" type="range" min="32" max="140" step="4" [value]="selected.size" (input)="updateSize($event)" />
     </div>
 
-    @if (selected.type === 'graph-node') {
-      <div class="property-group">
-        <label for="graph-node-form">Form</label>
-        <select id="graph-node-form" [value]="selected.shape" (change)="updateNodeShape($event)">
-          <option value="circle">Circle</option>
-          <option value="square">Square</option>
-          <option value="diamond">Diamond</option>
-          <option value="triangle">Triangle</option>
-        </select>
-      </div>
-    }
+    <div class="property-group">
+      <label for="shape-form">Form</label>
+      <select id="shape-form" [value]="selected.shape" (change)="updateNodeShape($event)">
+        <option value="circle">Circle</option>
+        <option value="square">Square</option>
+        <option value="diamond">Diamond</option>
+        <option value="triangle">Triangle</option>
+      </select>
+    </div>
 
     <label class="blinking-control" for="shape-blinking">
       <span><strong>Blinking</strong><small>Highlight this shape during an algorithm step.</small></span>

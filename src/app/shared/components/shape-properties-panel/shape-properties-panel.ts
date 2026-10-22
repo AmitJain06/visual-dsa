@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { CanvasElement } from '../../models/canvas-shape';
+import { CanvasElement, CanvasNodeShape, CanvasNodeStyle, GraphNodeValueType } from '../../models/canvas-shape';
 
 @Component({
   selector: 'app-shape-properties-panel',
@@ -16,21 +16,46 @@ export class ShapePropertiesPanel {
   readonly shapeChange = output<CanvasElement>();
   readonly close = output<void>();
 
-  protected update(changes: Partial<CanvasElement>): void {
+  protected update(changes: Partial<CanvasNodeStyle>): void {
     const shape = this.shape();
-    if (shape) this.shapeChange.emit({ ...shape, ...changes });
+    if (!shape) return;
+    this.shapeChange.emit({ ...shape, ...changes } as CanvasElement);
   }
 
-  protected updateValue(event: Event): void {
+  protected updateGraphNodeValue(event: Event): void {
     const shape = this.shape();
     if (shape?.type !== 'graph-node') return;
     const input = event.currentTarget as HTMLInputElement;
+    if (shape.valueType === 'boolean') {
+      this.shapeChange.emit({ ...shape, value: input.checked });
+      return;
+    }
+    if (shape.valueType === 'string' || shape.valueType === 'char') {
+      this.shapeChange.emit({ ...shape, value: shape.valueType === 'char' ? input.value.slice(0, 1) : input.value });
+      return;
+    }
     const value = Number(input.value);
-    if (!Number.isInteger(value)) {
+    if (!input.value || !Number.isFinite(value) || (shape.valueType === 'int' && !Number.isInteger(value))) {
       input.value = String(shape.value);
       return;
     }
-    this.update({ value });
+    this.shapeChange.emit({ ...shape, value });
+  }
+
+  protected updateGraphNodeValueType(event: Event): void {
+    const shape = this.shape();
+    if (shape?.type !== 'graph-node') return;
+    const valueType = (event.currentTarget as HTMLSelectElement).value as GraphNodeValueType;
+    if (valueType === shape.valueType) return;
+    const numberValue = typeof shape.value === 'number' ? shape.value : Number(shape.value);
+    const value = valueType === 'boolean'
+      ? shape.value === true || shape.value === 1 || shape.value === 'true'
+      : valueType === 'string' || valueType === 'char'
+        ? valueType === 'char' ? String(shape.value).slice(0, 1) : String(shape.value)
+        : Number.isFinite(numberValue)
+          ? valueType === 'int' ? Math.trunc(numberValue) : numberValue
+          : 0;
+    this.shapeChange.emit({ ...shape, valueType, value });
   }
 
   protected updateColor(event: Event): void {
@@ -46,8 +71,6 @@ export class ShapePropertiesPanel {
   }
 
   protected updateNodeShape(event: Event): void {
-    const shape = this.shape();
-    if (shape?.type !== 'graph-node') return;
-    this.update({ shape: (event.currentTarget as HTMLSelectElement).value as typeof shape.shape });
+    this.update({ shape: (event.currentTarget as HTMLSelectElement).value as CanvasNodeShape });
   }
 }
