@@ -18,6 +18,10 @@ Treat shapes as configurable, typed visual elements that the program can create 
 - `ArrayElement`
 - Directed and undirected edges
 
+`GraphNode` is implemented as the first domain shape and has its own standalone Angular component. Each future shape type must also have its own component with adjacent TypeScript, HTML, and SCSS files. A shape component owns its rendering and shape-specific visual behavior; the canvas owns the shared workspace interactions. `GraphNode` has an integer value, color, diameter (`size`, in canvas units), blinking state, and form (`shape`), which defaults to `circle`. Keep its state explicit in the shared model so the host program can create and update it.
+
+Keep shape property editing in the reusable `ShapePropertiesPanel` component. Adding a shape uses its defaults and does not open the editor. Right-clicking a canvas shape opens the properties panel as a sliding drawer from the right; suppress the browser context menu for that shape. The panel emits updated shape data to the canvas; it should be extended with shared controls and type-specific sections as new shapes are added.
+
 Shape data should support domain values and visual properties needed by problems, such as color, blocked/disabled state, and algorithm state. Use stable identifiers so program state and canvas elements can be synchronized reliably.
 
 Keep shape definitions and shared types separate from the canvas surface. Prefer a shape catalog/registry or another extensible configuration boundary over growing conditionals and a hard-coded palette inside the canvas component. Shape-specific rendering and properties belong to the shape system; generic placement and workspace interactions belong to the canvas.

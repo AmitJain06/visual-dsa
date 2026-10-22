@@ -46,7 +46,7 @@
       </div>
 
       <div class="palette-list">
-        @for (shape of palette; track shape.type) {
+        @for (shape of availableShapes(); track shape.type) {
           <button
             class="palette-item"
             type="button"
@@ -62,17 +62,7 @@
         }
       </div>
 
-      @if (selectedShape(); as selected) {
-        <div class="inspector">
-          <div class="inspector-title"><span class="selection-dot" [style.background]="selected.stroke"></span><h3>Selected shape</h3></div>
-          <label for="canvas-shape-label">Label</label>
-          <input id="canvas-shape-label" maxlength="18" [value]="selected.text" (input)="updateSelectedLabel($event)" />
-          <div class="inspector-hint"><i class="pi pi-arrows-alt" aria-hidden="true"></i><span>Drag to move · arrow keys for precision</span></div>
-          <button class="remove-shape" type="button" (click)="deleteSelectedShape()"><i class="pi pi-trash" aria-hidden="true"></i> Remove shape</button>
-        </div>
-      } @else {
-        <div class="palette-tip"><i class="pi pi-lightbulb" aria-hidden="true"></i><span>Select a shape to edit its label or duplicate it.</span></div>
-      }
+      <div class="palette-tip"><i class="pi pi-lightbulb" aria-hidden="true"></i><span>Double-click a shape on the canvas to edit its properties.</span></div>
 
       <div class="palette-footer"><i class="pi pi-info-circle" aria-hidden="true"></i><span>Everything stays in this workspace.</span></div>
     </aside>
@@ -118,40 +108,36 @@
 
         @for (shape of shapes(); track shape.id) {
           <g
+            app-graph-node
             class="canvas-shape"
+            [node]="shape"
+            [selected]="selectedId() === shape.id"
             [class.is-selected]="selectedId() === shape.id"
             [class.is-connection-source]="pendingConnectionSourceId() === shape.id"
+            [class.is-blinking]="shape.blinking"
             [class.connectable]="connectMode()"
             [attr.transform]="'translate(' + shape.x + ' ' + shape.y + ')'"
-            [attr.aria-label]="shape.text + ', ' + shape.label.toLowerCase()"
+            [attr.aria-label]="'Graph node, value ' + shape.value"
             [attr.aria-pressed]="selectedId() === shape.id"
             tabindex="0"
             role="button"
             (pointerdown)="beginShapeMove($event, shape)"
             (click)="selectShape(shape.id)"
+            (contextmenu)="openShapeProperties($event, shape)"
             (keydown)="moveShapeWithKeyboard($event, shape)"
-          >
-            @if (selectedId() === shape.id) {
-              <circle class="selection-ring" r="48" />
-            }
-            @switch (shape.type) {
-              @case ('circle') {
-                <circle class="shape-geometry" r="36" [attr.fill]="shape.fill" [attr.stroke]="shape.stroke" />
-              }
-              @case ('rectangle') {
-                <rect class="shape-geometry" x="-48" y="-32" width="96" height="64" rx="14" [attr.fill]="shape.fill" [attr.stroke]="shape.stroke" />
-              }
-              @case ('triangle') {
-                <polygon class="shape-geometry" points="0,-40 42,34 -42,34" [attr.fill]="shape.fill" [attr.stroke]="shape.stroke" />
-              }
-              @case ('diamond') {
-                <polygon class="shape-geometry" points="0,-42 42,0 0,42 -42,0" [attr.fill]="shape.fill" [attr.stroke]="shape.stroke" />
-              }
-            }
-            <text class="shape-label" text-anchor="middle" dominant-baseline="central">{{ shape.text }}</text>
-          </g>
+          ></g>
         }
       </svg>
+
+      @if (editingShape()) {
+        <button class="properties-backdrop" type="button" aria-label="Close shape properties" (click)="closeShapeProperties()"></button>
+      }
+      <app-shape-properties-panel
+        [shape]="editingShape()"
+        [open]="editingShape() !== null"
+        (shapeChange)="updateShape($event)"
+        (close)="closeShapeProperties()"
+      />
 
       @if (shapes().length === 0) {
         <div class="empty-state" aria-hidden="true">

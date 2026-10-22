@@ -1,18 +1,24 @@
-export type CanvasShapeType = 'circle' | 'rectangle' | 'triangle' | 'diamond';
+export type GraphNodeShape = 'circle' | 'square' | 'diamond' | 'triangle';
 
-export interface CanvasShapeDefinition {
-  type: CanvasShapeType;
-  label: string;
-  fill: string;
-  stroke: string;
+export interface GraphNodeDefinition {
+  type: 'graph-node';
+  label: 'Graph node';
+  color: string;
 }
 
-export interface CanvasShape extends CanvasShapeDefinition {
+export interface GraphNode extends GraphNodeDefinition {
   id: string;
   x: number;
   y: number;
-  text: string;
+  value: number;
+  /** Diameter in canvas units. */
+  size: number;
+  blinking: boolean;
+  shape: GraphNodeShape;
 }
+
+export type CanvasElement = GraphNode;
+export type CanvasElementDefinition = GraphNodeDefinition;
 
 export interface CanvasConnection {
   id: string;
@@ -20,9 +26,6 @@ export interface CanvasConnection {
   targetId: string;
 }
 
-export const CANVAS_SHAPE_PALETTE: readonly CanvasShapeDefinition[] = [
-  { type: 'circle', label: 'Circle', fill: '#efedff', stroke: '#776be8' },
-  { type: 'rectangle', label: 'Rectangle', fill: '#e8f3ff', stroke: '#579ad8' },
-  { type: 'triangle', label: 'Triangle', fill: '#fff0e9', stroke: '#e78d64' },
-  { type: 'diamond', label: 'Diamond', fill: '#e5f7f0', stroke: '#4db48a' }
+export const CANVAS_SHAPE_PALETTE: readonly CanvasElementDefinition[] = [
+  { type: 'graph-node', label: 'Graph node', color: '#776be8' }
 ];

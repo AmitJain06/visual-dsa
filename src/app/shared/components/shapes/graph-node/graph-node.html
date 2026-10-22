@@ -1,0 +1,29 @@
+<svg
+  class="graph-node-renderer"
+  [attr.x]="-node().size / 2 - 12"
+  [attr.y]="-node().size / 2 - 12"
+  [attr.width]="node().size + 24"
+  [attr.height]="node().size + 24"
+  [attr.viewBox]="(-node().size / 2 - 12) + ' ' + (-node().size / 2 - 12) + ' ' + (node().size + 24) + ' ' + (node().size + 24)"
+>
+  @if (selected()) {
+    <circle class="selection-ring" [attr.r]="node().size / 2 + 10" />
+  }
+
+  @switch (node().shape) {
+    @case ('circle') {
+      <circle class="shape-geometry graph-node-geometry" [attr.r]="node().size / 2" [attr.fill]="node().color" fill-opacity=".18" [attr.stroke]="node().color" />
+    }
+    @case ('square') {
+      <rect class="shape-geometry graph-node-geometry" [attr.x]="-node().size / 2" [attr.y]="-node().size / 2" [attr.width]="node().size" [attr.height]="node().size" rx="8" [attr.fill]="node().color" fill-opacity=".18" [attr.stroke]="node().color" />
+    }
+    @case ('diamond') {
+      <polygon class="shape-geometry graph-node-geometry" [attr.points]="'0,' + (-node().size / 2) + ' ' + (node().size / 2) + ',0 0,' + (node().size / 2) + ' ' + (-node().size / 2) + ',0'" [attr.fill]="node().color" fill-opacity=".18" [attr.stroke]="node().color" />
+    }
+    @case ('triangle') {
+      <polygon class="shape-geometry graph-node-geometry" [attr.points]="'0,' + (-node().size / 2) + ' ' + (node().size / 2) + ',' + (node().size / 2) + ' ' + (-node().size / 2) + ',' + (node().size / 2)" [attr.fill]="node().color" fill-opacity=".18" [attr.stroke]="node().color" />
+    }
+  }
+
+  <text class="shape-label" text-anchor="middle" dominant-baseline="central">{{ node().value }}</text>
+</svg>

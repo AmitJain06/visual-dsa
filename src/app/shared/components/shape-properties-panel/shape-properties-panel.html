@@ -1,0 +1,52 @@
+@if (shape(); as selected) {
+  <aside class="properties-panel" aria-labelledby="shape-properties-title">
+    <header class="panel-header">
+      <div>
+        <span class="panel-kicker">SHAPE SETTINGS</span>
+        <h3 id="shape-properties-title">{{ selected.label }}</h3>
+      </div>
+      <button class="close-button" type="button" aria-label="Close shape properties" (click)="close.emit()">
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </header>
+
+    @if (selected.type === 'graph-node') {
+      <div class="property-group">
+        <label for="graph-node-value">Integer value</label>
+        <input id="graph-node-value" type="number" step="1" [value]="selected.value" (input)="updateValue($event)" />
+      </div>
+    }
+
+    <div class="property-group">
+      <label for="shape-color">Color</label>
+      <div class="color-control">
+        <input id="shape-color" class="color-input" type="color" [value]="selected.color" (input)="updateColor($event)" />
+        <span>{{ selected.color }}</span>
+      </div>
+    </div>
+
+    <div class="property-group">
+      <label for="shape-size">Size <span>{{ selected.size }} units</span></label>
+      <input id="shape-size" class="range-input" type="range" min="32" max="140" step="4" [value]="selected.size" (input)="updateSize($event)" />
+    </div>
+
+    @if (selected.type === 'graph-node') {
+      <div class="property-group">
+        <label for="graph-node-form">Form</label>
+        <select id="graph-node-form" [value]="selected.shape" (change)="updateNodeShape($event)">
+          <option value="circle">Circle</option>
+          <option value="square">Square</option>
+          <option value="diamond">Diamond</option>
+          <option value="triangle">Triangle</option>
+        </select>
+      </div>
+    }
+
+    <label class="blinking-control" for="shape-blinking">
+      <span><strong>Blinking</strong><small>Highlight this shape during an algorithm step.</small></span>
+      <input id="shape-blinking" type="checkbox" [checked]="selected.blinking" (change)="updateBlinking($event)" />
+    </label>
+
+    <p class="panel-footnote"><i class="pi pi-info-circle" aria-hidden="true"></i> Changes update the canvas immediately.</p>
+  </aside>
+}

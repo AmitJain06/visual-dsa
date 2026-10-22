@@ -1,5 +1,7 @@
 import { Component, computed, ElementRef, input, model, signal, viewChild } from '@angular/core';
-import { CanvasConnection, CanvasShape, CanvasShapeDefinition, CANVAS_SHAPE_PALETTE } from '../../models/canvas-shape';
+import { CanvasConnection, CanvasElement, CanvasElementDefinition, CANVAS_SHAPE_PALETTE, GraphNode } from '../../models/canvas-shape';
+import { GraphNodeComponent } from '../shapes/graph-node/graph-node';
+import { ShapePropertiesPanel } from '../shape-properties-panel/shape-properties-panel';
 
 interface CanvasPoint {
   x: number;
@@ -15,6 +17,7 @@ interface ShapeDrag {
 
 @Component({
   selector: 'app-visual-canvas',
+  imports: [GraphNodeComponent, ShapePropertiesPanel],
   templateUrl: './visual-canvas.html',
   styleUrl: './visual-canvas.scss'
 })
@@ -24,9 +27,11 @@ export class VisualCanvas {
   private nextConnectionId = 1;
 
   readonly canvasTitle = input('Visual canvas');
-  readonly shapes = model<CanvasShape[]>([]);
+  readonly availableShapes = input<readonly CanvasElementDefinition[]>(CANVAS_SHAPE_PALETTE);
+  readonly shapes = model<CanvasElement[]>([]);
   readonly connections = model<CanvasConnection[]>([]);
   protected readonly selectedId = signal<string | null>(null);
+  protected readonly editingShapeId = signal<string | null>(null);
   protected readonly connectMode = signal(false);
   protected readonly pendingConnectionSourceId = signal<string | null>(null);
   protected readonly snapToGrid = signal(true);
@@ -34,20 +39,22 @@ export class VisualCanvas {
   protected readonly statusMessage = signal('Drag a shape onto the board, or choose one from the palette.');
   protected readonly gridPatternId = `visual-canvas-grid-${++VisualCanvas.nextCanvasId}`;
   protected readonly arrowMarkerId = `visual-canvas-arrow-${VisualCanvas.nextCanvasId}`;
-  protected readonly palette = CANVAS_SHAPE_PALETTE;
   protected readonly selectedShape = computed(
     () => this.shapes().find((shape) => shape.id === this.selectedId()) ?? null
+  );
+  protected readonly editingShape = computed(
+    () => this.shapes().find((shape) => shape.id === this.editingShapeId()) ?? null
   );
 
   private readonly surface = viewChild<ElementRef<SVGSVGElement>>('surface');
   private readonly activeDrag = signal<ShapeDrag | null>(null);
 
-  protected addShapeFromPalette(definition: CanvasShapeDefinition): void {
+  protected addShapeFromPalette(definition: CanvasElementDefinition): void {
     const offset = (this.shapes().length % 5) * 28;
     this.addShape(definition, { x: 500 + offset, y: 300 + offset });
   }
 
-  protected beginPaletteDrag(event: DragEvent, definition: CanvasShapeDefinition): void {
+  protected beginPaletteDrag(event: DragEvent, definition: CanvasElementDefinition): void {
     if (!event.dataTransfer) return;
     event.dataTransfer.effectAllowed = 'copy';
     event.dataTransfer.setData('application/x-visual-canvas-shape', definition.type);
@@ -70,14 +77,14 @@ export class VisualCanvas {
 
     const type = event.dataTransfer?.getData('application/x-visual-canvas-shape')
       || event.dataTransfer?.getData('text/plain');
-    const definition = this.palette.find((item) => item.type === type);
+    const definition = this.availableShapes().find((item) => item.type === type);
     const point = this.pointFromClient(event.clientX, event.clientY);
 
     if (!definition || !point) return;
     this.addShape(definition, point);
   }
 
-  protected beginShapeMove(event: PointerEvent, shape: CanvasShape): void {
+  protected beginShapeMove(event: PointerEvent, shape: CanvasElement): void {
     if (event.button !== 0) return;
     if (this.connectMode()) {
       event.preventDefault();
@@ -124,11 +131,29 @@ export class VisualCanvas {
     const target = event.target;
     if (target instanceof SVGElement && (target === event.currentTarget || target.classList.contains('canvas-grid'))) {
       this.selectedId.set(null);
+      this.closeShapeProperties();
     }
   }
 
   protected selectShape(shapeId: string): void {
     this.selectedId.set(shapeId);
+    if (this.editingShapeId() !== shapeId) this.closeShapeProperties();
+  }
+
+  protected openShapeProperties(event: MouseEvent, shape: CanvasElement): void {
+    event.preventDefault();
+    this.selectedId.set(shape.id);
+    this.editingShapeId.set(shape.id);
+  }
+
+  protected closeShapeProperties(): void {
+    this.editingShapeId.set(null);
+  }
+
+  protected updateShape(updatedShape: CanvasElement): void {
+    this.shapes.update((shapes) => shapes.map((shape) =>
+      shape.id === updatedShape.id ? updatedShape : shape
+    ));
   }
 
   protected toggleConnectMode(): void {
@@ -149,7 +174,7 @@ export class VisualCanvas {
     return `M ${start.x} ${start.y} L ${end.x} ${end.y}`;
   }
 
-  protected moveShapeWithKeyboard(event: KeyboardEvent, shape: CanvasShape): void {
+  protected moveShapeWithKeyboard(event: KeyboardEvent, shape: CanvasElement): void {
     const steps: Record<string, CanvasPoint> = {
       ArrowLeft: { x: -20, y: 0 },
       ArrowRight: { x: 20, y: 0 },
@@ -195,8 +220,9 @@ export class VisualCanvas {
       (connection) => connection.sourceId !== selected.id && connection.targetId !== selected.id
     ));
     if (this.pendingConnectionSourceId() === selected.id) this.pendingConnectionSourceId.set(null);
+    if (this.editingShapeId() === selected.id) this.closeShapeProperties();
     this.selectedId.set(null);
-    this.statusMessage.set(`${selected.label} removed from canvas.`);
+    this.statusMessage.set(`Graph node ${selected.value} removed from canvas.`);
   }
 
   protected clearCanvas(): void {
@@ -204,55 +230,52 @@ export class VisualCanvas {
     this.connections.set([]);
     this.selectedId.set(null);
     this.pendingConnectionSourceId.set(null);
+    this.closeShapeProperties();
     this.statusMessage.set('Canvas cleared. Add a shape from the palette.');
   }
 
-  protected updateSelectedLabel(event: Event): void {
-    const selected = this.selectedShape();
-    const text = (event.currentTarget as HTMLInputElement).value;
-    if (!selected) return;
-
-    this.shapes.update((shapes) => shapes.map((shape) => shape.id === selected.id ? { ...shape, text } : shape));
-  }
-
-  private addShape(definition: CanvasShapeDefinition, point: CanvasPoint): void {
+  private addShape(definition: CanvasElementDefinition, point: CanvasPoint): void {
     const id = this.createShapeId();
-    const shape: CanvasShape = {
+    const shape: GraphNode = {
       ...definition,
       id,
       x: point.x,
       y: point.y,
-      text: `${definition.label} ${this.nextShapeId - 1}`
+      value: 0,
+      size: 72,
+      blinking: false,
+      shape: 'circle'
     };
     this.shapes.update((shapes) => [...shapes, shape]);
     this.selectedId.set(id);
-    this.statusMessage.set(`${shape.text} added. Use arrow keys to move it, or drag it on the canvas.`);
+    this.statusMessage.set(`Graph node ${shape.value} added. Use arrow keys to move it, or drag it on the canvas.`);
   }
 
   private createShapeId(): string {
     return `canvas-shape-${this.nextShapeId++}`;
   }
 
-  private shapeBoundaryPoint(shape: CanvasShape, other: CanvasShape): CanvasPoint {
+  private shapeBoundaryPoint(shape: CanvasElement, other: CanvasElement): CanvasPoint {
     const dx = other.x - shape.x;
     const dy = other.y - shape.y;
-    if (shape.type === 'circle') {
+    if (shape.shape === 'circle') {
       const distance = Math.hypot(dx, dy) || 1;
-      return { x: shape.x + (dx / distance) * 36, y: shape.y + (dy / distance) * 36 };
+      const radius = shape.size / 2;
+      return { x: shape.x + (dx / distance) * radius, y: shape.y + (dy / distance) * radius };
     }
 
-    const halfWidth = shape.type === 'rectangle' ? 48 : 42;
-    const halfHeight = shape.type === 'rectangle' ? 32 : 42;
+    const halfWidth = shape.size / 2;
+    const halfHeight = shape.size / 2;
     const scale = 1 / Math.max(Math.abs(dx) / halfWidth, Math.abs(dy) / halfHeight, 1);
     return { x: shape.x + dx * scale, y: shape.y + dy * scale };
   }
 
-  private pickConnectionEndpoint(shape: CanvasShape): void {
+  private pickConnectionEndpoint(shape: CanvasElement): void {
     const sourceId = this.pendingConnectionSourceId();
     if (!sourceId) {
       this.pendingConnectionSourceId.set(shape.id);
       this.selectedId.set(shape.id);
-      this.statusMessage.set(`Source selected: ${shape.text}. Choose a different shape to connect it.`);
+      this.statusMessage.set(`Source selected: Graph node ${shape.value}. Choose a destination node.`);
       return;
     }
     if (sourceId === shape.id) {
@@ -264,14 +287,15 @@ export class VisualCanvas {
       connection.sourceId === sourceId && connection.targetId === shape.id
     );
     if (exists) {
-      this.statusMessage.set(`A connection to ${shape.text} already exists.`);
+      this.statusMessage.set(`A connection to Graph node ${shape.value} already exists.`);
     } else {
       this.connections.update((connections) => [...connections, {
         id: `canvas-connection-${this.nextConnectionId++}`,
         sourceId,
         targetId: shape.id
       }]);
-      this.statusMessage.set(`Connected ${this.shapes().find((item) => item.id === sourceId)?.text} to ${shape.text}.`);
+      const sourceValue = this.shapes().find((item) => item.id === sourceId)?.value;
+      this.statusMessage.set(`Connected Graph node ${sourceValue} to Graph node ${shape.value}.`);
     }
     this.pendingConnectionSourceId.set(null);
   }
@@ -290,8 +314,10 @@ export class VisualCanvas {
   private setShapePosition(shapeId: string, x: number, y: number): void {
     const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
     const snap = (value: number) => this.snapToGrid() ? Math.round(value / 20) * 20 : value;
-    const nextX = clamp(snap(x), 48, 952);
-    const nextY = clamp(snap(y), 48, 572);
+    const shape = this.shapes().find((item) => item.id === shapeId);
+    const padding = shape?.size ? shape.size / 2 : 48;
+    const nextX = clamp(snap(x), padding, 1000 - padding);
+    const nextY = clamp(snap(y), padding, 620 - padding);
 
     this.shapes.update((shapes) => shapes.map((shape) => shape.id === shapeId
       ? { ...shape, x: nextX, y: nextY }
