@@ -1,0 +1,76 @@
+<section class="javascript-editor" aria-label="JavaScript code editor">
+  <header class="editor-toolbar">
+    <div class="editor-title">
+      <span class="file-icon"><i class="pi pi-file" aria-hidden="true"></i></span>
+      <div><strong>main.js</strong><small>{{ statusMessage() }}</small></div>
+    </div>
+    <div class="editor-actions">
+      @if (isPaused()) {
+        <button class="action-button continue-button" type="button" (click)="continueExecution()">
+          <i class="pi pi-play" aria-hidden="true"></i><span>Continue</span>
+        </button>
+      } @else {
+        <button class="action-button debug-button" type="button" [disabled]="isRunning()" (click)="debug()" title="Pause on selected lines">
+          <i class="pi pi-bug" aria-hidden="true"></i><span>Debug</span>
+        </button>
+        <button class="action-button run-button" type="button" [disabled]="isRunning()" (click)="run()">
+          <i class="pi pi-play" aria-hidden="true"></i><span>Run</span>
+        </button>
+      }
+      @if (isRunning()) {
+        <button class="action-button stop-button" type="button" (click)="stop()"><i class="pi pi-stop" aria-hidden="true"></i><span>Stop</span></button>
+      }
+    </div>
+  </header>
+
+  <div class="editor-body">
+    <div class="source-editor">
+      <div #lineGutter class="line-gutter" aria-label="Code lines" [style.transform]="'translateY(-' + gutterScrollTop() + 'px)'">
+        @for (line of lines(); track line) {
+          <button
+            type="button"
+            class="line-number"
+            [class.has-breakpoint]="hasBreakpoint(line)"
+            [class.current-debug-line]="currentDebugLine() === line"
+            [attr.aria-label]="(hasBreakpoint(line) ? 'Remove' : 'Set') + ' breakpoint on line ' + line"
+            [attr.aria-pressed]="hasBreakpoint(line)"
+            (click)="toggleBreakpoint(line)"
+          >{{ line }}</button>
+        }
+      </div>
+      <textarea
+        class="code-input"
+        aria-label="JavaScript source code"
+        spellcheck="false"
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off"
+        [value]="code()"
+        (input)="updateCode($event)"
+        (keydown)="insertIndent($event)"
+        (scroll)="syncGutter($event)"
+      ></textarea>
+    </div>
+
+    <section class="console-panel" aria-label="Console output">
+      <header class="console-header">
+        <div><i class="pi pi-terminal" aria-hidden="true"></i><strong>Console</strong><span class="console-count">{{ output().length }}</span></div>
+        <button type="button" class="clear-output" (click)="clearOutput()">Clear</button>
+      </header>
+      <div class="console-output" role="log" aria-live="polite" aria-relevant="additions">
+        @if (output().length === 0) {
+          <p class="console-empty">Run your code to see output here.</p>
+        }
+        @for (entry of output(); track $index) {
+          <div class="console-entry" [class]="'console-entry level-' + entry.level">
+            @if (entry.level === 'error') { <i class="pi pi-times-circle" aria-hidden="true"></i> }
+            @else if (entry.level === 'warn') { <i class="pi pi-exclamation-triangle" aria-hidden="true"></i> }
+            @else if (entry.level === 'system') { <i class="pi pi-info-circle" aria-hidden="true"></i> }
+            <pre>{{ entry.text }}</pre>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+  <footer class="editor-footer"><i class="pi pi-lightbulb" aria-hidden="true"></i><span>Click a line number to toggle a breakpoint. Debug pauses here until you continue.</span><span class="language-tag">JavaScript</span></footer>
+</section>

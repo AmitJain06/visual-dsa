@@ -32,7 +32,7 @@ export class AppSidebar {
   readonly itemSelected = output<void>();
   readonly expandRequested = output<void>();
 
-  protected readonly expandedGroups = signal(new Set(['algorithms', 'sorting', 'searching', 'structures', 'linear-structures', 'trees', 'graph', 'graph-problems']));
+  protected readonly expandedGroups = signal(new Set(['algorithms', 'sorting', 'searching', 'structures', 'linear-structures', 'trees', 'graph', 'graph-problems', 'practice', 'coding-practice']));
 
   protected readonly navigation: NavigationGroup[] = [
     {
@@ -41,6 +41,14 @@ export class AppSidebar {
       icon: 'pi-share-alt',
       subgroups: [
         { id: 'graph-problems', label: 'Problems', pages: [{ label: '1514. Path with Maximum Probability', path: '/graph/path-with-maximum-probability' }] }
+      ]
+    },
+    {
+      id: 'practice',
+      label: 'Practice',
+      icon: 'pi-code',
+      subgroups: [
+        { id: 'coding-practice', label: 'Code editor', pages: [{ label: 'JavaScript', path: '/practice/javascript' }] }
       ]
     },
     {

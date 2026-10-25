@@ -1,0 +1,10 @@
+:host { display: block; min-height: 100%; }
+.practice-page { display: grid; width: min(100%, 1500px); gap: 1rem; margin: 0 auto; padding: clamp(1.1rem, 2.4vw, 2rem); }
+.breadcrumb { display: flex; align-items: center; gap: .55rem; color: #a0a1b1; font-size: .73rem; }
+.breadcrumb a { color: #85879a; text-decoration: none; }
+.breadcrumb a:hover { color: #645cda; }
+.breadcrumb .pi { font-size: .62rem; }
+.page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.3rem; }
+.eyebrow { display: inline-flex; align-items: center; gap: .4rem; color: #7169dc; font-size: .62rem; font-weight: 750; letter-spacing: .14em; }
+h1 { margin: .55rem 0 .4rem; color: #292a3e; font-size: clamp(1.55rem, 3vw, 2.25rem); line-height: 1.18; letter-spacing: -.045em; }
+.page-heading p { max-width: 780px; margin: 0; color: #818396; font-size: .83rem; line-height: 1.55; }
