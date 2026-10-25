@@ -1,0 +1,28 @@
+<section class="array-workspace" [attr.aria-label]="title() + ' configuration'">
+  <header class="array-toolbar">
+    <div class="array-toolbar-heading">
+      <span class="array-toolbar-kicker">DATA STRUCTURE</span>
+      <h2>{{ title() }} settings</h2>
+      <p>Add Array nodes to build the elements on the canvas.</p>
+    </div>
+
+    <label class="element-value-type" for="array-element-value-type">
+      <span>Element value type</span>
+      <select id="array-element-value-type" [value]="elementValueType()" (change)="updateElementValueType($event)">
+        <option value="int">Integer</option>
+        <option value="char">Character</option>
+        <option value="double">Double</option>
+        <option value="boolean">Boolean</option>
+      </select>
+    </label>
+  </header>
+
+  <app-visual-canvas
+    [canvasTitle]="title() + ' canvas'"
+    [availableShapes]="availableShapes"
+    [shapeDefaults]="shapeDefaults()"
+    [shapePropertyVisibility]="propertyVisibility"
+    [shapes]="shapes()"
+    (shapesChange)="shapes.set($event)"
+  />
+</section>

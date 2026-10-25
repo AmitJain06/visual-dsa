@@ -17,18 +17,20 @@
         <i class="pi pi-th-large" aria-hidden="true"></i>
         <span>Snap {{ snapToGrid() ? 'on' : 'off' }}</span>
       </button>
-      <button
-        class="tool-button"
-        type="button"
-        [class.is-active]="edgeCreationMode()"
-        [attr.aria-pressed]="edgeCreationMode()"
-        (click)="toggleEdgeCreationMode()"
-      >
-        <i class="pi pi-share-alt" aria-hidden="true"></i>
-        <span>{{ edgeCreationMode() ? 'Adding edge' : 'Add edge' }}</span>
-      </button>
-      <span class="toolbar-divider" aria-hidden="true"></span>
-      <button class="tool-button icon-tool" type="button" [disabled]="!selectedShape() || selectedShape()?.type === 'edge'" aria-label="Duplicate selected shape" title="Duplicate selected graph node" (click)="duplicateSelectedShape()">
+      @if (hasEdgeTool()) {
+        <button
+          class="tool-button"
+          type="button"
+          [class.is-active]="edgeCreationMode()"
+          [attr.aria-pressed]="edgeCreationMode()"
+          (click)="toggleEdgeCreationMode()"
+        >
+          <i class="pi pi-share-alt" aria-hidden="true"></i>
+          <span>{{ edgeCreationMode() ? 'Adding edge' : 'Add edge' }}</span>
+        </button>
+        <span class="toolbar-divider" aria-hidden="true"></span>
+      }
+      <button class="tool-button icon-tool" type="button" [disabled]="!selectedShape() || selectedShape()?.type === 'edge'" aria-label="Duplicate selected shape" title="Duplicate selected node" (click)="duplicateSelectedShape()">
         <i class="pi pi-clone" aria-hidden="true"></i>
       </button>
       <button class="tool-button icon-tool" type="button" [disabled]="!selectedShape()" aria-label="Delete selected shape" title="Delete selected shape" (click)="deleteSelectedShape()">
@@ -41,7 +43,7 @@
   <div class="canvas-layout">
     <aside class="palette-panel" aria-label="Shape palette">
       <div class="panel-heading">
-        <div><h3>Shapes</h3><p>Drag nodes; select Edge to connect</p></div>
+        <div><h3>Shapes</h3><p>Drag or click a shape to add it</p></div>
         <span class="shape-count">{{ shapes().length }}</span>
       </div>
 
@@ -50,8 +52,8 @@
           <button
             class="palette-item"
             type="button"
-            [draggable]="shape.type === 'graph-node'"
-            [attr.aria-label]="shape.type === 'edge' ? 'Add an edge by selecting two graph nodes' : 'Add a graph node to canvas. Drag or click.'"
+            [draggable]="shape.type !== 'edge'"
+            [attr.aria-label]="shape.type === 'edge' ? 'Add an edge by selecting two graph nodes' : 'Add ' + shape.label + ' to canvas. Drag or click.'"
             (dragstart)="beginPaletteDrag($event, shape)"
             (click)="addShapeFromPalette(shape)"
           >
@@ -62,7 +64,7 @@
         }
       </div>
 
-      <div class="palette-tip"><i class="pi pi-lightbulb" aria-hidden="true"></i><span>Select Edge, then choose two graph nodes. Right-click a shape to edit its properties.</span></div>
+      <div class="palette-tip"><i class="pi pi-lightbulb" aria-hidden="true"></i><span>Right-click any shape to edit its properties.</span></div>
 
       <div class="palette-footer"><i class="pi pi-info-circle" aria-hidden="true"></i><span>Everything stays in this workspace.</span></div>
     </aside>
@@ -117,7 +119,7 @@
                 (keydown)="moveShapeWithKeyboard($event, shape)"
               ></g>
             }
-          } @else {
+          } @else if (shape.type === 'graph-node') {
             <g
               app-graph-node
               class="canvas-shape"
@@ -129,6 +131,24 @@
               [class.connectable]="edgeCreationMode()"
               [attr.transform]="'translate(' + shape.x + ' ' + shape.y + ')'"
               [attr.aria-label]="'Graph node, value ' + shape.value"
+              [attr.aria-pressed]="selectedId() === shape.id"
+              tabindex="0"
+              role="button"
+              (pointerdown)="beginShapeMove($event, shape)"
+              (click)="selectShape(shape.id)"
+              (contextmenu)="openShapeProperties($event, shape)"
+              (keydown)="moveShapeWithKeyboard($event, shape)"
+            ></g>
+          } @else {
+            <g
+              app-array-node
+              class="canvas-shape"
+              [node]="shape"
+              [selected]="selectedId() === shape.id"
+              [class.is-selected]="selectedId() === shape.id"
+              [class.is-blinking]="shape.blinking"
+              [attr.transform]="'translate(' + shape.x + ' ' + shape.y + ')'"
+              [attr.aria-label]="'Array node, value ' + shape.value"
               [attr.aria-pressed]="selectedId() === shape.id"
               tabindex="0"
               role="button"

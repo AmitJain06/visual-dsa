@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { CanvasElement, CanvasNodeShape, CanvasShapePropertyVisibility, CanvasShapeStyle, Edge, GraphNode, GraphNodeValueType } from '../../models/canvas-shape';
+import { ArrayNodeValueType, CanvasElement, CanvasNodeShape, CanvasShapePropertyVisibility, CanvasShapeStyle, Edge, GraphNode, GraphNodeValueType } from '../../models/canvas-shape';
 
 @Component({
   selector: 'app-shape-properties-panel',
@@ -27,7 +27,7 @@ export class ShapePropertiesPanel {
 
   protected updateGraphNodeValue(event: Event): void {
     const shape = this.shape();
-    if (shape?.type !== 'graph-node') return;
+    if (!shape || (shape.type !== 'graph-node' && shape.type !== 'array-node')) return;
     const input = event.currentTarget as HTMLInputElement;
     if (shape.valueType === 'boolean') {
       this.shapeChange.emit({ ...shape, value: input.checked });
@@ -59,6 +59,46 @@ export class ShapePropertiesPanel {
           ? valueType === 'int' ? Math.trunc(numberValue) : numberValue
           : 0;
     this.shapeChange.emit({ ...shape, valueType, value });
+  }
+
+  protected updateArrayNodeValue(event: Event): void {
+    const shape = this.shape();
+    if (shape?.type !== 'array-node') return;
+    const input = event.currentTarget as HTMLInputElement;
+    if (shape.valueType === 'boolean') {
+      this.shapeChange.emit({ ...shape, value: input.checked });
+    } else if (shape.valueType === 'char') {
+      this.shapeChange.emit({ ...shape, value: input.value.slice(0, 1) });
+    } else {
+      const value = Number(input.value);
+      if (!input.value || !Number.isFinite(value) || (shape.valueType === 'int' && !Number.isInteger(value))) {
+        input.value = String(shape.value);
+        return;
+      }
+      this.shapeChange.emit({ ...shape, value });
+    }
+  }
+
+  protected updateArrayNodeValueType(event: Event): void {
+    const shape = this.shape();
+    if (shape?.type !== 'array-node') return;
+    const valueType = (event.currentTarget as HTMLSelectElement).value as ArrayNodeValueType;
+    if (valueType === shape.valueType) return;
+    const numericValue = Number(shape.value);
+    const value = valueType === 'boolean'
+      ? shape.value === true || shape.value === 1 || shape.value === 'true'
+      : valueType === 'char'
+        ? String(shape.value).slice(0, 1) || 'A'
+        : Number.isFinite(numericValue)
+          ? valueType === 'int' ? Math.trunc(numericValue) : numericValue
+          : 0;
+    this.shapeChange.emit({ ...shape, valueType, value });
+  }
+
+  protected updateArrayNodeSize(event: Event): void {
+    const shape = this.shape();
+    if (shape?.type !== 'array-node') return;
+    this.shapeChange.emit({ ...shape, size: Number((event.currentTarget as HTMLInputElement).value) });
   }
 
   protected updateGraphNodeSize(event: Event): void {
@@ -107,6 +147,6 @@ export class ShapePropertiesPanel {
   private updateCommon(changes: Partial<Pick<CanvasShapeStyle, 'color' | 'blinking'>>): void {
     const shape = this.shape();
     if (!shape) return;
-    this.shapeChange.emit({ ...shape, ...changes } as GraphNode | Edge);
+    this.shapeChange.emit({ ...shape, ...changes } as CanvasElement);
   }
 }

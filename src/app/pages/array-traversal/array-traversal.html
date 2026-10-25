@@ -1,0 +1,35 @@
+<main class="array-page">
+  <div class="breadcrumb"><a routerLink="/">Overview</a><i class="pi pi-angle-right" aria-hidden="true"></i><span>Arrays</span></div>
+
+  <header class="page-heading">
+    <div>
+      <span class="eyebrow"><i class="pi pi-list" aria-hidden="true"></i> ARRAY ALGORITHM</span>
+      <h1>Array traversal</h1>
+      <p>Visit each element in order. Add or edit array nodes on the canvas, then step through the array to see each visit.</p>
+    </div>
+    <div class="array-size"><span>ARRAY SIZE</span><strong>{{ arrayModel().size }}</strong></div>
+  </header>
+
+  <section class="traversal-card" aria-label="Traversal controls">
+    <div class="traversal-copy">
+      <span class="section-kicker">STEP-BY-STEP</span>
+      <h2>Walk through the elements</h2>
+      <p>Traversal follows the order in the Array model, starting at index 0.</p>
+    </div>
+    <div class="traversal-actions">
+      <span class="progress-count">{{ visitedCount() }} / {{ arrayModel().size }} visited</span>
+      <button class="step-button" type="button" [disabled]="!canStep()" (click)="stepTraversal()">
+        <i class="pi pi-step-forward" aria-hidden="true"></i>
+        {{ currentIndex() >= arrayModel().size ? 'Complete' : 'Visit next' }}
+      </button>
+      <button class="reset-button" type="button" (click)="resetTraversal()"><i class="pi pi-refresh" aria-hidden="true"></i> Reset</button>
+    </div>
+    <p class="status-message" aria-live="polite"><i class="pi pi-info-circle" aria-hidden="true"></i>{{ statusMessage() }}</p>
+  </section>
+
+  <app-array
+    title="Traversal array"
+    [shapes]="arrayModel().arrayNodes"
+    (shapesChange)="updateArrayNodes($event)"
+  />
+</main>

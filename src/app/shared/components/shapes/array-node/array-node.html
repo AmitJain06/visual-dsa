@@ -1,0 +1,14 @@
+<svg
+  class="array-node-renderer"
+  [attr.x]="-node().size * .75 - 12"
+  [attr.y]="-node().size / 2 - 12"
+  [attr.width]="node().size * 1.5 + 24"
+  [attr.height]="node().size + 24"
+  [attr.viewBox]="(-node().size * .75 - 12) + ' ' + (-node().size / 2 - 12) + ' ' + (node().size * 1.5 + 24) + ' ' + (node().size + 24)"
+>
+  @if (selected()) {
+    <rect class="selection-ring" [attr.x]="-node().size * .75 - 8" [attr.y]="-node().size / 2 - 8" [attr.width]="node().size * 1.5 + 16" [attr.height]="node().size + 16" rx="9" />
+  }
+  <rect class="array-cell" [attr.x]="-node().size * .75" [attr.y]="-node().size / 2" [attr.width]="node().size * 1.5" [attr.height]="node().size" rx="5" [attr.fill]="node().color" fill-opacity=".16" [attr.stroke]="node().color" />
+  <text class="shape-label" text-anchor="middle" dominant-baseline="central">{{ node().value }}</text>
+</svg>

@@ -49,6 +49,35 @@
           <option value="triangle">Triangle</option>
         </select>
       </div>
+    } @else if (selected.type === 'array-node') {
+      @if (propertyVisibility().arrayNode?.valueType !== false) {
+        <div class="property-group">
+          <label for="array-node-value-type">Value type</label>
+          <select id="array-node-value-type" [value]="selected.valueType" (change)="updateArrayNodeValueType($event)">
+            <option value="int">Integer</option>
+            <option value="char">Character</option>
+            <option value="double">Double</option>
+            <option value="boolean">Boolean</option>
+          </select>
+        </div>
+      }
+      <div class="property-group">
+        <label for="array-node-value">Value</label>
+        @if (selected.valueType === 'boolean') {
+          <div class="boolean-control">
+            <span>{{ selected.value === true ? 'True' : 'False' }}</span>
+            <input id="array-node-value" class="boolean-input" type="checkbox" [checked]="selected.value === true" (change)="updateArrayNodeValue($event)" />
+          </div>
+        } @else if (selected.valueType === 'char') {
+          <input id="array-node-value" class="value-input character-input" type="text" maxlength="1" [value]="selected.value" placeholder="A" (input)="updateArrayNodeValue($event)" />
+        } @else {
+          <input id="array-node-value" class="value-input" type="number" [attr.step]="selected.valueType === 'int' ? '1' : 'any'" [value]="selected.value" (input)="updateArrayNodeValue($event)" />
+        }
+      </div>
+      <div class="property-group">
+        <label for="array-node-size">Size <span>{{ selected.size }} units</span></label>
+        <input id="array-node-size" class="range-input" type="range" min="48" max="160" step="4" [value]="selected.size" (input)="updateArrayNodeSize($event)" />
+      </div>
     } @else {
       @if (propertyVisibility().edge?.directed !== false) {
       <div class="property-group">

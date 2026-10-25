@@ -1,7 +1,11 @@
 import { Component, computed, effect, input, model, untracked } from '@angular/core';
-import { CanvasElement, CanvasShapeDefaults, CanvasShapePropertyVisibility, CANVAS_SHAPE_PALETTE, GraphNode, GraphNodeValueType } from '../../../models/canvas-shape';
+import { CanvasElement, CanvasElementDefinition, CanvasShapeDefaults, CanvasShapePropertyVisibility, CANVAS_SHAPE_PALETTE, EdgeDefinition, GraphNode, GraphNodeDefinition, GraphNodeValueType } from '../../../models/canvas-shape';
 import { GraphAdjacencyList } from '../../../models/graph-adjacency-list';
 import { VisualCanvas } from '../../visual-canvas/visual-canvas';
+
+const GRAPH_SHAPES: readonly CanvasElementDefinition[] = CANVAS_SHAPE_PALETTE.filter(
+  (shape): shape is GraphNodeDefinition | EdgeDefinition => shape.type !== 'array-node'
+);
 
 @Component({
   selector: 'app-graph',
@@ -18,7 +22,7 @@ export class Graph {
   readonly directed = model(true);
   readonly weighted = model(false);
   readonly nodeValueType = model<GraphNodeValueType>('int');
-  protected readonly availableShapes = CANVAS_SHAPE_PALETTE;
+  protected readonly availableShapes = GRAPH_SHAPES;
   protected readonly shapeDefaults = computed<CanvasShapeDefaults>(() => ({
     graphNode: { valueType: this.nodeValueType() },
     edge: { directed: this.directed(), weighted: this.weighted() }
@@ -48,8 +52,11 @@ export class Graph {
           if (shape.directed === directed && shape.weighted === weighted && (weighted || shape.weight === undefined)) return shape;
           return { ...shape, directed, weighted, weight: weighted ? shape.weight ?? 1 : undefined };
         }
-        if (shape.valueType === nodeValueType) return shape;
-        return { ...shape, valueType: nodeValueType, value: this.convertValue(shape.value, nodeValueType) };
+        if (shape.type === 'graph-node') {
+          if (shape.valueType === nodeValueType) return shape;
+          return { ...shape, valueType: nodeValueType, value: this.convertValue(shape.value, nodeValueType) };
+        }
+        return shape;
       })));
     });
   }

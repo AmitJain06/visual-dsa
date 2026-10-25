@@ -1,0 +1,11 @@
+:host { cursor: grab; outline: none; touch-action: none; }
+:host(:active) { cursor: grabbing; }
+:host(:focus-visible) .array-cell { stroke-width: 3; }
+:host(.is-selected) .array-cell { stroke-width: 2.5; filter: drop-shadow(0 5px 8px #36335b20); }
+.array-cell { stroke-width: 2; vector-effect: non-scaling-stroke; transition: filter .15s ease, stroke-width .15s ease; }
+.selection-ring { fill: #756ce80b; stroke: #8d86ed; stroke-dasharray: 4 5; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.shape-label { fill: #3d3e53; font-family: Inter, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 650; pointer-events: none; user-select: none; }
+.array-node-renderer { overflow: visible; }
+:host(.is-blinking) .array-cell { animation: array-node-blink 1s ease-in-out infinite; }
+@keyframes array-node-blink { 50% { opacity: .28; } }
+@media (prefers-reduced-motion: reduce) { :host(.is-blinking) .array-cell { animation: none; opacity: .55; } }

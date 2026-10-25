@@ -1,7 +1,8 @@
 import { Component, computed, ElementRef, input, model, signal, viewChild } from '@angular/core';
-import { CanvasElement, CanvasElementDefinition, CanvasPoint, CanvasShapeDefaults, CanvasShapePropertyVisibility, CANVAS_SHAPE_PALETTE, Edge, GraphNode, GraphNodeDefinition } from '../../models/canvas-shape';
+import { ArrayNode, ArrayNodeDefinition, ArrayNodeValueType, CanvasElement, CanvasElementDefinition, CanvasPoint, CanvasShapeDefaults, CanvasShapePropertyVisibility, CANVAS_SHAPE_PALETTE, Edge, GraphNode, GraphNodeDefinition } from '../../models/canvas-shape';
 import { EdgeComponent } from '../shapes/edge/edge';
 import { GraphNodeComponent } from '../shapes/graph-node/graph-node';
+import { ArrayNodeComponent } from '../shapes/array-node/array-node';
 import { ShapePropertiesPanel } from '../shape-properties-panel/shape-properties-panel';
 
 interface ShapeDrag {
@@ -18,7 +19,7 @@ interface EdgeEndpoints {
 
 @Component({
   selector: 'app-visual-canvas',
-  imports: [GraphNodeComponent, EdgeComponent, ShapePropertiesPanel],
+  imports: [GraphNodeComponent, ArrayNodeComponent, EdgeComponent, ShapePropertiesPanel],
   templateUrl: './visual-canvas.html',
   styleUrl: './visual-canvas.scss'
 })
@@ -39,7 +40,7 @@ export class VisualCanvas {
   protected readonly pendingEdgeSourceId = signal<string | null>(null);
   protected readonly snapToGrid = signal(true);
   protected readonly isDragOver = signal(false);
-  protected readonly statusMessage = signal('Drag a graph node onto the board, or choose one from the palette.');
+  protected readonly statusMessage = signal('Drag a shape onto the board, or choose one from the palette.');
   protected readonly gridPatternId = `visual-canvas-grid-${this.canvasInstanceId}`;
   protected readonly selectedShape = computed(
     () => this.shapes().find((shape) => shape.id === this.selectedId()) ?? null
@@ -51,17 +52,22 @@ export class VisualCanvas {
   private readonly surface = viewChild<ElementRef<SVGSVGElement>>('surface');
   private readonly activeDrag = signal<ShapeDrag | null>(null);
 
+  protected hasEdgeTool(): boolean {
+    return this.availableShapes().some((shape) => shape.type === 'edge');
+  }
+
   protected addShapeFromPalette(definition: CanvasElementDefinition): void {
     if (definition.type === 'edge') {
       this.beginEdgeCreation();
       return;
     }
-    const offset = (this.shapes().filter((shape) => shape.type === 'graph-node').length % 5) * 28;
-    this.addGraphNode(definition, { x: 500 + offset, y: 300 + offset });
+    const offset = (this.shapes().filter((shape) => shape.type !== 'edge').length % 5) * 28;
+    if (definition.type === 'graph-node') this.addGraphNode(definition, { x: 500 + offset, y: 300 + offset });
+    else this.addArrayNode(definition, { x: 500 + offset, y: 300 + offset });
   }
 
   protected beginPaletteDrag(event: DragEvent, definition: CanvasElementDefinition): void {
-    if (definition.type !== 'graph-node' || !event.dataTransfer) {
+    if (definition.type === 'edge' || !event.dataTransfer) {
       event.preventDefault();
       return;
     }
@@ -88,8 +94,9 @@ export class VisualCanvas {
     const type = event.dataTransfer?.getData('application/x-visual-canvas-shape');
     const definition = this.availableShapes().find((item) => item.type === type);
     const point = this.pointFromClient(event.clientX, event.clientY);
-    if (!definition || definition.type !== 'graph-node' || !point) return;
-    this.addGraphNode(definition, point);
+    if (!definition || definition.type === 'edge' || !point) return;
+    if (definition.type === 'graph-node') this.addGraphNode(definition, point);
+    else this.addArrayNode(definition, point);
   }
 
   protected beginShapeMove(event: PointerEvent, shape: CanvasElement): void {
@@ -195,7 +202,7 @@ export class VisualCanvas {
       this.deleteSelectedShape();
       return;
     }
-    if (shape.type !== 'graph-node') return;
+    if (shape.type === 'edge') return;
     const steps: Record<string, CanvasPoint> = {
       ArrowLeft: { x: -20, y: 0 },
       ArrowRight: { x: 20, y: 0 },
@@ -218,7 +225,7 @@ export class VisualCanvas {
     const selected = this.selectedShape();
     if (!selected || selected.type === 'edge') return;
     const id = this.createShapeId();
-    const copy: GraphNode = { ...selected, id };
+    const copy: GraphNode | ArrayNode = { ...selected, id };
     this.shapes.update((shapes) => [...shapes, copy]);
     this.selectedId.set(id);
     this.setShapePosition(id, selected.x + 40, selected.y + 40);
@@ -242,7 +249,7 @@ export class VisualCanvas {
     this.pendingEdgeSourceId.set(null);
     this.edgeCreationMode.set(false);
     this.closeShapeProperties();
-    this.statusMessage.set('Canvas cleared. Add a graph node from the palette.');
+    this.statusMessage.set('Canvas cleared. Add a shape from the palette.');
   }
 
   private beginEdgeCreation(): void {
@@ -322,8 +329,31 @@ export class VisualCanvas {
     this.statusMessage.set(`Graph node ${node.value} added. Use arrow keys to move it, or drag it on the canvas.`);
   }
 
+  private addArrayNode(definition: ArrayNodeDefinition, point: CanvasPoint): void {
+    const valueType = this.shapeDefaults().arrayNode?.valueType ?? 'int';
+    const node: ArrayNode = {
+      ...definition,
+      id: this.createShapeId(),
+      x: point.x,
+      y: point.y,
+      size: 80,
+      blinking: false,
+      valueType,
+      value: this.defaultArrayNodeValue(valueType)
+    };
+    this.shapes.update((shapes) => [...shapes, node]);
+    this.selectedId.set(node.id);
+    this.statusMessage.set(`Array node with value ${node.value} added. Right-click to edit its value and type.`);
+  }
+
   private defaultGraphNodeValue(valueType: GraphNode['valueType']): GraphNode['value'] {
     if (valueType === 'string') return '';
+    if (valueType === 'char') return 'A';
+    if (valueType === 'boolean') return false;
+    return 0;
+  }
+
+  private defaultArrayNodeValue(valueType: ArrayNodeValueType): ArrayNode['value'] {
     if (valueType === 'char') return 'A';
     if (valueType === 'boolean') return false;
     return 0;
@@ -365,12 +395,13 @@ export class VisualCanvas {
   private setShapePosition(shapeId: string, x: number, y: number): void {
     const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
     const snap = (value: number) => this.snapToGrid() ? Math.round(value / 20) * 20 : value;
-    const shape = this.graphNodeById(shapeId);
-    if (!shape) return;
-    const padding = shape.size / 2;
-    const nextX = clamp(snap(x), padding, 1000 - padding);
-    const nextY = clamp(snap(y), padding, 620 - padding);
-    this.shapes.update((shapes) => shapes.map((item) => item.id === shapeId && item.type === 'graph-node'
+    const shape = this.shapes().find((item) => item.id === shapeId);
+    if (!shape || shape.type === 'edge') return;
+    const horizontalPadding = shape.type === 'array-node' ? shape.size * .75 : shape.size / 2;
+    const verticalPadding = shape.size / 2;
+    const nextX = clamp(snap(x), horizontalPadding, 1000 - horizontalPadding);
+    const nextY = clamp(snap(y), verticalPadding, 620 - verticalPadding);
+    this.shapes.update((shapes) => shapes.map((item) => item.id === shapeId && item.type !== 'edge'
       ? { ...item, x: nextX, y: nextY }
       : item));
   }
