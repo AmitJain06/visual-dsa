@@ -5,7 +5,7 @@
     <div>
       <span class="eyebrow"><i class="pi pi-list" aria-hidden="true"></i> ARRAY ALGORITHM</span>
       <h1>Array traversal</h1>
-      <p>Visit each element in order. Add or edit array nodes on the canvas, then step through the array to see each visit.</p>
+      <p>Write a traversal in JavaScript. The code receives current array values through <code>context.array</code>; call <code>await visualize.visit(index)</code> to highlight an element.</p>
     </div>
     <div class="array-size"><span>ARRAY SIZE</span><strong>{{ arrayModel().size }}</strong></div>
   </header>
@@ -26,6 +26,14 @@
     </div>
     <p class="status-message" aria-live="polite"><i class="pi pi-info-circle" aria-hidden="true"></i>{{ statusMessage() }}</p>
   </section>
+
+  <app-javascript-editor
+    [(code)]="traversalCode"
+    [context]="editorContext()"
+    [pauseOnVisualization]="true"
+    [visualizationDelayMs]="650"
+    (visualization)="visualizeCode($event)"
+  />
 
   <app-array
     title="Traversal array"
