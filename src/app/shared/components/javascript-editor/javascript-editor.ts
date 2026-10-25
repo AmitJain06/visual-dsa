@@ -2,6 +2,7 @@ import { Component, OnDestroy, computed, input, model, output, signal } from '@a
 
 type ConsoleLevel = 'log' | 'info' | 'warn' | 'error' | 'system';
 type ExecutionMode = 'run' | 'debug';
+type ConsoleLayout = 'bottom' | 'right' | 'hidden';
 
 interface ConsoleEntry {
   level: ConsoleLevel;
@@ -106,6 +107,8 @@ export class JavascriptEditor implements OnDestroy {
   protected readonly currentDebugLine = signal<number | null>(null);
   protected readonly executionMode = signal<ExecutionMode | null>(null);
   protected readonly statusMessage = signal('Ready');
+  protected readonly consoleLayout = signal<ConsoleLayout>('bottom');
+  protected readonly consoleShare = signal(30);
   protected readonly breakpointLines = signal(new Set<number>());
   protected readonly gutterScrollTop = signal(0);
   protected readonly lines = computed(() => Array.from(
@@ -177,6 +180,60 @@ export class JavascriptEditor implements OnDestroy {
 
   protected clearOutput(): void {
     this.output.set([]);
+  }
+
+  protected setConsoleLayout(layout: ConsoleLayout): void {
+    this.consoleLayout.set(layout);
+  }
+
+  protected startResize(event: PointerEvent): void {
+    if (event.button !== 0) return;
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    event.preventDefault();
+  }
+
+  protected resizePanes(event: PointerEvent): void {
+    if (event.buttons !== 1) return;
+    const handle = event.currentTarget as HTMLElement;
+    const body = handle.closest('.editor-body');
+    if (!body) return;
+    const bounds = body.getBoundingClientRect();
+    const share = this.consoleLayout() === 'right'
+      ? ((bounds.right - event.clientX) / bounds.width) * 100
+      : ((bounds.bottom - event.clientY) / bounds.height) * 100;
+    this.consoleShare.set(Math.max(10, Math.min(90, Math.round(share))));
+  }
+
+  protected resizeWithKeyboard(event: KeyboardEvent): void {
+    const increase = this.consoleLayout() === 'right'
+      ? event.key === 'ArrowLeft'
+      : event.key === 'ArrowUp';
+    const decrease = this.consoleLayout() === 'right'
+      ? event.key === 'ArrowRight'
+      : event.key === 'ArrowDown';
+    if (!increase && !decrease) return;
+    event.preventDefault();
+    this.consoleShare.update((share) => Math.max(10, Math.min(90, share + (increase ? 5 : -5))));
+  }
+
+  protected minimizeConsole(): void {
+    this.consoleShare.set(10);
+  }
+
+  protected maximizeConsole(): void {
+    this.consoleShare.set(90);
+  }
+
+  protected paneRows(): string {
+    return this.consoleLayout() === 'bottom'
+      ? `minmax(0, ${100 - this.consoleShare()}fr) 8px minmax(0, ${this.consoleShare()}fr)`
+      : 'minmax(0, 1fr)';
+  }
+
+  protected paneColumns(): string {
+    return this.consoleLayout() === 'right'
+      ? `minmax(0, ${100 - this.consoleShare()}fr) 8px minmax(0, ${this.consoleShare()}fr)`
+      : 'minmax(0, 1fr)';
   }
 
   ngOnDestroy(): void {

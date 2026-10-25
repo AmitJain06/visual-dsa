@@ -20,10 +20,15 @@
       @if (isRunning()) {
         <button class="action-button stop-button" type="button" (click)="stop()"><i class="pi pi-stop" aria-hidden="true"></i><span>Stop</span></button>
       }
+      @if (consoleLayout() === 'hidden') {
+        <button class="action-button console-toggle" type="button" (click)="setConsoleLayout('bottom')" title="Show console">
+          <i class="pi pi-terminal" aria-hidden="true"></i><span>Console</span>
+        </button>
+      }
     </div>
   </header>
 
-  <div class="editor-body">
+  <div class="editor-body" [class.console-right]="consoleLayout() === 'right'" [class.console-hidden]="consoleLayout() === 'hidden'" [style.grid-template-rows]="paneRows()" [style.grid-template-columns]="paneColumns()">
     <div class="source-editor">
       <div #lineGutter class="line-gutter" aria-label="Code lines" [style.transform]="'translateY(-' + gutterScrollTop() + 'px)'">
         @for (line of lines(); track line) {
@@ -52,25 +57,48 @@
       ></textarea>
     </div>
 
-    <section class="console-panel" aria-label="Console output">
-      <header class="console-header">
-        <div><i class="pi pi-terminal" aria-hidden="true"></i><strong>Console</strong><span class="console-count">{{ output().length }}</span></div>
-        <button type="button" class="clear-output" (click)="clearOutput()">Clear</button>
-      </header>
-      <div class="console-output" role="log" aria-live="polite" aria-relevant="additions">
-        @if (output().length === 0) {
-          <p class="console-empty">Run your code to see output here.</p>
-        }
-        @for (entry of output(); track $index) {
-          <div class="console-entry" [class]="'console-entry level-' + entry.level">
-            @if (entry.level === 'error') { <i class="pi pi-times-circle" aria-hidden="true"></i> }
-            @else if (entry.level === 'warn') { <i class="pi pi-exclamation-triangle" aria-hidden="true"></i> }
-            @else if (entry.level === 'system') { <i class="pi pi-info-circle" aria-hidden="true"></i> }
-            <pre>{{ entry.text }}</pre>
+    @if (consoleLayout() !== 'hidden') {
+      <div
+        class="pane-resizer"
+        [class.vertical]="consoleLayout() === 'right'"
+        role="separator"
+        tabindex="0"
+        [attr.aria-orientation]="consoleLayout() === 'right' ? 'vertical' : 'horizontal'"
+        [attr.aria-valuenow]="consoleShare()"
+        aria-valuemin="10"
+        aria-valuemax="90"
+        aria-label="Resize code editor and console"
+        (pointerdown)="startResize($event)"
+        (pointermove)="resizePanes($event)"
+        (keydown)="resizeWithKeyboard($event)"
+      ><span></span></div>
+      <section class="console-panel" aria-label="Console output">
+        <header class="console-header">
+          <div class="console-heading"><i class="pi pi-terminal" aria-hidden="true"></i><strong>Console</strong><span class="console-count">{{ output().length }}</span></div>
+          <div class="console-actions">
+            <button type="button" class="console-layout-button" [class.selected]="consoleLayout() === 'bottom'" aria-label="Place console at bottom" title="Place at bottom" (click)="setConsoleLayout('bottom')"><i class="pi pi-arrow-down" aria-hidden="true"></i></button>
+            <button type="button" class="console-layout-button" [class.selected]="consoleLayout() === 'right'" aria-label="Place console at right" title="Place at right" (click)="setConsoleLayout('right')"><i class="pi pi-arrow-right" aria-hidden="true"></i></button>
+            <button type="button" class="console-layout-button" aria-label="Minimize console" title="Minimize console" (click)="minimizeConsole()"><i class="pi pi-window-minimize" aria-hidden="true"></i></button>
+            <button type="button" class="console-layout-button" aria-label="Maximize console" title="Maximize console" (click)="maximizeConsole()"><i class="pi pi-window-maximize" aria-hidden="true"></i></button>
+            <button type="button" class="console-layout-button" aria-label="Hide console" title="Hide console" (click)="setConsoleLayout('hidden')"><i class="pi pi-eye-slash" aria-hidden="true"></i></button>
+            <button type="button" class="clear-output" (click)="clearOutput()">Clear</button>
           </div>
-        }
-      </div>
-    </section>
+        </header>
+        <div class="console-output" role="log" aria-live="polite" aria-relevant="additions">
+          @if (output().length === 0) {
+            <p class="console-empty">Run your code to see output here.</p>
+          }
+          @for (entry of output(); track $index) {
+            <div class="console-entry" [class]="'console-entry level-' + entry.level">
+              @if (entry.level === 'error') { <i class="pi pi-times-circle" aria-hidden="true"></i> }
+              @else if (entry.level === 'warn') { <i class="pi pi-exclamation-triangle" aria-hidden="true"></i> }
+              @else if (entry.level === 'system') { <i class="pi pi-info-circle" aria-hidden="true"></i> }
+              <pre>{{ entry.text }}</pre>
+            </div>
+          }
+        </div>
+      </section>
+    }
   </div>
   <footer class="editor-footer"><i class="pi pi-lightbulb" aria-hidden="true"></i><span>Click a line number to toggle a breakpoint. Debug pauses here until you continue.</span><span class="language-tag">JavaScript</span></footer>
 </section>
