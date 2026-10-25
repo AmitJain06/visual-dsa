@@ -1,22 +1,6 @@
+<div class="app-shell">
+  <app-sidebar />
+  <app-topbar />
 
-    <div class="app-shell" [class.is-collapsed]="sidebarCollapsed() && !mobileOpen()">
-      <app-sidebar
-        [collapsed]="sidebarCollapsed()"
-        [mobileOpen]="mobileOpen()"
-        (itemSelected)="closeMobileSidebar()"
-        (expandRequested)="expandSidebar()"
-      />
-
-      @if (mobileOpen()) {
-        <button class="mobile-backdrop" type="button" aria-label="Close navigation" (click)="closeMobileSidebar()"></button>
-      }
-
-      <app-topbar
-        [mobileOpen]="mobileOpen()"
-        [currentPage]="currentPage()"
-        (navigationToggle)="toggleSidebar()"
-      />
-
-      <main class="page-content"><router-outlet /></main>
-    </div>
-  
+  <main class="page-content"><router-outlet /></main>
+</div>

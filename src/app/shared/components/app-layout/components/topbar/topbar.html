@@ -1,22 +1,6 @@
-
-    <header class="topbar">
-      <div class="topbar-start">
-        <button
-          class="icon-button menu-toggle"
-          type="button"
-          [attr.aria-label]="mobileOpen() ? 'Close navigation' : 'Toggle navigation'"
-          (click)="navigationToggle.emit()"
-        >
-          <i [class]="'pi ' + (mobileOpen() ? 'pi-times' : 'pi-bars')" aria-hidden="true"></i>
-        </button>
-        <div class="breadcrumb"><span>Workspace</span><i class="pi pi-angle-right" aria-hidden="true"></i><strong>{{ currentPage() }}</strong></div>
-      </div>
-      <div class="topbar-end">
-        <span class="topbar-note"><span class="status-dot"></span> Your learning space</span>
-        <button class="icon-button notification-button" type="button" aria-label="Notifications">
-          <i class="pi pi-bell" aria-hidden="true"></i><span class="notification-dot"></span>
-        </button>
-        <div class="avatar" aria-label="User profile">AJ</div>
-      </div>
-    </header>
-  
+<header class="topbar" aria-label="Account">
+  <div class="profile" aria-label="User profile">
+    <span class="avatar">AJ</span>
+    <i class="pi pi-chevron-down" aria-hidden="true"></i>
+  </div>
+</header>

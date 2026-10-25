@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 interface NavigationPage {
@@ -22,17 +22,11 @@ interface NavigationGroup {
 @Component({
   selector: 'app-sidebar',
   imports: [RouterLink, RouterLinkActive],
-  host: { '[class.mobile-open]': 'mobileOpen()' },
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss'
 })
 export class AppSidebar {
-  readonly collapsed = input(false);
-  readonly mobileOpen = input(false);
-  readonly itemSelected = output<void>();
-  readonly expandRequested = output<void>();
-
-  protected readonly expandedGroups = signal(new Set(['algorithms', 'sorting', 'searching', 'structures', 'linear-structures', 'trees', 'graph', 'graph-problems', 'practice', 'coding-practice']));
+  protected readonly expandedGroup = signal<string | null>(null);
 
   protected readonly navigation: NavigationGroup[] = [
     {
@@ -73,24 +67,14 @@ export class AppSidebar {
   ];
 
   protected isExpanded(groupId: string): boolean {
-    return this.expandedGroups().has(groupId);
+    return this.expandedGroup() === groupId;
   }
 
   protected toggleGroup(groupId: string): void {
-    if (this.collapsed() && !this.mobileOpen()) {
-      this.expandRequested.emit();
-      this.expandedGroups.update((groups) => new Set(groups).add(groupId));
-      return;
-    }
+    this.expandedGroup.update((current) => current === groupId ? null : groupId);
+  }
 
-    this.expandedGroups.update((groups) => {
-      const next = new Set(groups);
-      if (next.has(groupId)) {
-        next.delete(groupId);
-      } else {
-        next.add(groupId);
-      }
-      return next;
-    });
+  protected closeGroups(): void {
+    this.expandedGroup.set(null);
   }
 }
