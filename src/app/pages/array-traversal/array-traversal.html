@@ -27,17 +27,35 @@
     <p class="status-message" aria-live="polite"><i class="pi pi-info-circle" aria-hidden="true"></i>{{ statusMessage() }}</p>
   </section>
 
-  <app-javascript-editor
-    [(code)]="traversalCode"
-    [context]="editorContext()"
-    [pauseOnVisualization]="true"
-    [visualizationDelayMs]="650"
-    (visualization)="visualizeCode($event)"
-  />
+  <section class="workspace-grid" aria-label="Code editor and array canvas" [style.grid-template-columns]="workspaceColumns()">
+    <app-javascript-editor
+      [(code)]="traversalCode"
+      [context]="editorContext()"
+      [pauseOnVisualization]="true"
+      [visualizationDelayMs]="650"
+      (visualization)="visualizeCode($event)"
+    />
 
-  <app-array
-    title="Traversal array"
-    [shapes]="arrayModel().arrayNodes"
-    (shapesChange)="updateArrayNodes($event)"
-  />
+    <div
+      class="workspace-resizer"
+      role="separator"
+      tabindex="0"
+      aria-orientation="vertical"
+      [attr.aria-valuenow]="editorShare()"
+      aria-valuemin="25"
+      aria-valuemax="75"
+      aria-label="Resize code editor and array canvas"
+      (pointerdown)="startWorkspaceResize($event)"
+      (pointermove)="resizeWorkspace($event)"
+      (pointerup)="endWorkspaceResize($event)"
+      (pointercancel)="endWorkspaceResize($event)"
+      (keydown)="resizeWorkspaceWithKeyboard($event)"
+    ><span></span></div>
+
+    <app-array
+      title="Traversal array"
+      [shapes]="arrayModel().arrayNodes"
+      (shapesChange)="updateArrayNodes($event)"
+    />
+  </section>
 </main>
